@@ -1,5 +1,5 @@
 [package]
-name = "fixed2float"
+name = "py-fixed2float"
 version = "0.1.0"
 authors = ["Francesco Urbani <francescourbanidue@gmail.com>"]
 edition = "2021"
@@ -8,4 +8,14 @@ keywords = ["fixed", "float", "q-format"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
+[workspace]
+
+
+[lib]
+name = "fixed2float"
+crate-type = ["cdylib"]
+
+
 [dependencies]
+fixed2float = { path = "../" }
+pyo3 = { version = "0.15.1", features = ["extension-module"], optional = false }
