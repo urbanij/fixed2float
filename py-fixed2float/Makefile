@@ -1,9 +1,9 @@
 UNAME_S := $(shell uname -s)
 ifeq ($(UNAME_S),Darwin)
-	EXTENSION := dylib
+	EXT := dylib
 endif
 ifeq ($(UNAME_S),Linux)
-	EXTENSION := so
+	EXT := so
 endif
 
 all:

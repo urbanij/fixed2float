@@ -99,4 +99,11 @@ mod tests {
         assert_eq!(to_fixed(10.25, 8, 1), Ok((21, false)));
         assert_eq!(to_fixed(1.387, 2, 15).unwrap().0, 45449);
     }
+
+    #[test]
+    fn back_and_forth() {
+        let x = 10.25;
+        let (m, n) = (21, 3);
+        assert_eq!(to_float(to_fixed(x, m, n).unwrap().0, m, n), x);
+    }
 }

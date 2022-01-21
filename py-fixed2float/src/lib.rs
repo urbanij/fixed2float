@@ -12,8 +12,15 @@ fn version() -> &'static str {
 }
 
 #[pyfunction]
-fn to_fixed(x: f64, m: u8, n: u8) -> PyResult<u64> {
-    Ok(f2f::to_fixed(x, m, n).unwrap().0)
+fn to_fixed(x: f64, m: u8, n: u8) -> PyResult<Option<(u64, bool)>> {
+    let ans = f2f::to_fixed(x, m, n);
+    match ans {
+        Ok((bits, is_exact)) => Ok(Some((bits, is_exact))),
+        Err(e) => {
+            println!("{}", e);
+            Ok(None)
+        }
+    }
 }
 
 #[pyfunction]
