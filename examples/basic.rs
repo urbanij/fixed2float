@@ -8,5 +8,7 @@ fn main() {
     let x = to_float(bits, m, n);
     println!("{}", x);
 
-    println!("{:?}", to_fixed(10.25, 8, 1));
+    // println!("{:?}", to_fixed(10.25, 8, 1));
+
+    println!("{:?}", to_fixed(0.65, 1, 15));
 }

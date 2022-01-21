@@ -6,8 +6,9 @@ Simple utility for fixed point to real number conversions, using [the Q notation
 
 - as a dependency of your Rust library
 
-```sh
-cargo add fixed2float # fills the Cargo.toml file
+```toml
+[dependencies]
+fixed2float = { git = "https://github.com/urbanij/fixed2float" }
 ```
 
 - as a dependency of your Python library

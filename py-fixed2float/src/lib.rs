@@ -1,7 +1,6 @@
 use pyo3::prelude::*;
 use pyo3::wrap_pyfunction;
 
-extern crate fixed2float;
 use fixed2float as f2f;
 
 const VERSION: &str = env!("CARGO_PKG_VERSION");
