@@ -1,0 +1,16 @@
+[package]
+name = "fixed2float"
+version = "0.1.0"
+authors = ["Francesco Urbani <francescourbanidue@gmail.com>"]
+edition = "2021"
+keywords = ["fixed", "float", "q-format"]
+
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+
+
+[lib]
+name = "fixed2float"
+type = ["rlib", "dylib"]
