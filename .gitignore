@@ -9,3 +9,5 @@ Cargo.lock
 *.dylib
 
 __pycache__
+
+py-*/dist

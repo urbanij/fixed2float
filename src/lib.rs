@@ -41,20 +41,21 @@ pub fn to_fixed(x: f64, m: u8, n: u8) -> Result<(u64, bool), String> {
     let integer_part_on_m_bits = integer_part & mask(m as u64);
 
     let mut fractional_part_on_n_bits = (fractional_part
-        & (mask(n as u64) << ((MANT_SIZE as i32 - exp as i32) as u64 - n as u64)))
-        >> ((MANT_SIZE as i32 - exp as i32) as u64 - n as u64);
+        & (mask(n as u64) << ((MANT_SIZE as i32 - exp as i32) - n as i32)))
+        >> ((MANT_SIZE as i32 - exp as i32) - n as i32);
 
     if integer_part_on_m_bits < integer_part {
         return Err("Integer field does not fit into `m`.".to_string());
     }
 
-    let round_bit = fractional_part >> ((MANT_SIZE as i32 - exp as i32) as u64 - (n as u64 + 1)) & 1 != 0;
+    let round_bit = fractional_part >> ((MANT_SIZE as i32 - exp as i32) - (n as i32 + 1)) & 1 != 0;
 
     if round_bit {
         fractional_part_on_n_bits += 1;
     }
 
-    let sticky_bit = fractional_part & mask((MANT_SIZE as i32 - exp as i32) as u64 - (n as u64 + 1)) != 0;
+    let sticky_bit =
+        fractional_part & mask(((MANT_SIZE as i32 - exp as i32) - (n as i32 + 1)) as u64) != 0;
 
     let is_exact = !sticky_bit && !round_bit;
     let ans = (integer_part_on_m_bits << n) + fractional_part_on_n_bits;
@@ -98,6 +99,7 @@ mod tests {
         assert_eq!(to_fixed(10.25, 8, 2), Ok((41, true)));
         assert_eq!(to_fixed(10.25, 8, 1), Ok((21, false)));
         assert_eq!(to_fixed(1.387, 2, 15).unwrap().0, 45449);
+        assert_eq!(to_fixed(4.3, 2, 15).is_err(), true);
     }
 
     #[test]
