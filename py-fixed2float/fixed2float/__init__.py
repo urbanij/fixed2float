@@ -1,24 +1,30 @@
 from .fixed2float import to_float
 
-RESET_COLOR = "\033[0m"
-ANSI_BLACK = "\033[1;37;40m"
-ANSI_COLOR_CYAN = "\x1b[36m"
+__ANSI_RESET_COLOR = "\033[0m"
+__ANSI_BLACK = "\033[1;37;40m"
+__ANSI_COLOR_CYAN = "\x1b[36m"
 
 
-def get_bin(x, n):
+def __get_bin(x, n):
     return format(x, "b").zfill(n)
 
-def to_fixed(x, m, n, fancy=True) -> str:
+# def to_float(bits, m, n) -> float:
+#     return __fixed2float.to_float(bits, m, n)
+
+
+def to_fixed(x, m, n):
     from .fixed2float import to_fixed
     
     ans = to_fixed(x, m, n)
     if ans == None:
         return
     else:    
-        if fancy:
-            is_exact = ans[1]
-            dots = "..." if not is_exact else ""
-            bits = get_bin(ans[0], m + n)
-            return f"{ANSI_COLOR_CYAN}{bits[:m]}{ANSI_BLACK}{bits[m:]}{RESET_COLOR}{dots}"
-        else:
-            return f"{ans}"
+        is_exact = ans[1]
+        dots = "..." if not is_exact else ""
+        bits = __get_bin(ans[0], m + n)
+        repr = f"{__ANSI_COLOR_CYAN}{bits[:m]}{__ANSI_BLACK}{bits[m:]}{__ANSI_RESET_COLOR}{dots}"
+        return {
+            "val": ans[0],
+            "is_exact": ans[1],
+            "repr": repr,
+        }

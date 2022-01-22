@@ -26,6 +26,10 @@ pip install fixed2float
 ```
 
 
+### Examples
+
+See `example.py` or `example/basic.rs`
+
 
 ### Similar projects
 

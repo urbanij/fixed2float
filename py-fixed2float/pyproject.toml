@@ -1,0 +1,20 @@
+[tool.poetry]
+name = "fixed2float"
+version = "0.1.0"
+description = "Utility for fixed point to floating point conversion"
+authors = ["Francesco Urbani <francescourbanidue@gmail.com>"]
+license = ""
+readme = 'README.md'
+homepage = ""
+repository = "https://github.com/urbanij/fixed2float"
+documentation = ""
+keywords = ["fixed", "float", "q-format"]
+
+packages = [
+    {include = "fixed2float"},
+    #{include = "tests", format = "sdist"},
+]
+include = [
+    # C extensions must be included in the wheel distributions
+    {path = "fixed2float/*.so", format = "wheel"},
+]
