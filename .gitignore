@@ -7,3 +7,5 @@ Cargo.lock
 
 *.so
 *.dylib
+
+__pycache__
