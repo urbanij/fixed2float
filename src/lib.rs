@@ -15,7 +15,7 @@ fn mant(bits: u64) -> u64 {
     bits & ((1 << MANT_SIZE) - 1)
 }
 
-/// Convert `x` f64 into fixed point format `Qm.n`, if possible.
+/// Convert `x` (f64) into fixed point format (Qm.n), if possible.
 /// ```rust
 /// use fixed2float::to_fixed;
 /// assert_eq!(to_fixed(1.5, 1, 3).unwrap(), (0b1100, true));
@@ -46,7 +46,7 @@ pub fn to_fixed(x: f64, m: i32, n: i32) -> Result<(u128, bool), String> {
     };
 
     if integer_part_on_m_bits < integer_part as u128 {
-        return Err(format!("Integer field does not fit into `m`."));
+        return Err(format!("Integer field does not fit into `m` {}.", m));
     }
 
     let round_bit = match ((MANT_SIZE as i32 - exp as i32) - (n as i32 + 1)) >= 0 {
@@ -58,17 +58,17 @@ pub fn to_fixed(x: f64, m: i32, n: i32) -> Result<(u128, bool), String> {
         fractional_part_on_n_bits += 1;
     }
 
-    let sticky_bit = match (MANT_SIZE as i32 - exp as i32 - n as i32 + 1) >= 0 {
-        true => fractional_part & mask((MANT_SIZE as i32 - exp as i32 - n as i32 + 1) as u128) != 0,
+    let sticky_bit = match (MANT_SIZE as i32 - exp as i32 - n as i32) >= 0 {
+        true => fractional_part & mask((MANT_SIZE as i32 - exp as i32 - n as i32) as u128) != 0,
         _ => false,
     };
 
     let is_exact = !sticky_bit && !round_bit;
     let ans = (integer_part_on_m_bits << n) + fractional_part_on_n_bits;
-    Ok((ans.into(), is_exact))
+    Ok((ans, is_exact))
 }
 
-/// Convert `bits` in the format `Qm.n` into a real number.
+/// Compute the real value represented by `bits` (str) in the form Qm.n.
 /// ```rust
 /// use fixed2float::to_float_str;
 /// assert_eq!(to_float_str("00010011000000100001", 12, 8), Ok(304.12890625));
@@ -108,10 +108,10 @@ pub fn to_float_str(bits: &str, m: i32, n: i32) -> Result<f64, String> {
     Ok(ans)
 }
 
-/// Convert `bits` in the format `Qm.n` into a real number.
+/// Compute the real value represented by `bits` (unsigned) in the form Qm.n.
 /// ```rust
 /// use fixed2float::to_float;
-/// assert_eq!(to_float(0x13021,20, 12, 8), Ok(304.12890625));
+/// assert_eq!(to_float(0x13021, 20, 12, 8), Ok(304.12890625));
 /// ```
 pub fn to_float(mut bits: i64, size: i32, m: i32, n: i32) -> Result<f64, String> {
     if size != m + n {
@@ -156,8 +156,19 @@ mod tests {
     fn test_to_fixed() {
         assert_eq!(to_fixed(10.25, 4, 3), Ok((82, true)));
         assert_eq!(to_fixed(10.25, 3, 3).is_err(), true);
+        assert_eq!(to_fixed(10.25, 8, 3), Ok((82, true)));
         assert_eq!(to_fixed(10.25, 8, 2), Ok((41, true)));
         assert_eq!(to_fixed(10.25, 8, 1), Ok((21, false)));
+        assert_eq!(to_fixed(10.25, 8, 0), Ok((10, false)));
+        assert_eq!(to_fixed(0.0078125, 1, 1), Ok((0, false)));
+        assert_eq!(to_fixed(0.0078125, 1, 2), Ok((0, false)));
+        assert_eq!(to_fixed(0.0078125, 1, 3), Ok((0, false)));
+        assert_eq!(to_fixed(0.0078125, 1, 4), Ok((0, false)));
+        assert_eq!(to_fixed(0.0078125, 1, 5), Ok((0, false)));
+        assert_eq!(to_fixed(0.0078125, 1, 6), Ok((1, false)));
+        assert_eq!(to_fixed(0.0078125, 1, 7), Ok((1, true)));
+        assert_eq!(to_fixed(0.0078125, 1, 8), Ok((2, true)));
+        assert_eq!(to_fixed(0.0078125, 1, 9), Ok((4, true)));
         assert_eq!(to_fixed(1.387, 2, 15).unwrap().0, 45449);
         assert_eq!(to_fixed(4.3, 2, 15).is_err(), true);
     }
