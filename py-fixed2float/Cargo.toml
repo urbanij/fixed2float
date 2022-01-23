@@ -1,6 +1,6 @@
 [package]
 name = "py-fixed2float"
-version = "0.1.0"
+version = "0.1.1"
 authors = ["Francesco Urbani <francescourbanidue@gmail.com>"]
 edition = "2021"
 keywords = ["fixed", "float", "q-format"]
@@ -20,6 +20,9 @@ description = "Utility for fixed point to floating point conversion"
 [lib]
 name = "fixed2float"
 crate-type = ["cdylib"]
+
+[package.metadata.maturin]
+name = "fixed2float"
 
 
 [dependencies]

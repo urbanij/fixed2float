@@ -1,20 +1,29 @@
-[tool.poetry]
-name = "fixed2float"
-version = "0.1.0"
-description = "Utility for fixed point to floating point conversion"
-authors = ["Francesco Urbani <francescourbanidue@gmail.com>"]
-license = ""
-readme = 'README.md'
-homepage = ""
-repository = "https://github.com/urbanij/fixed2float"
-documentation = ""
-keywords = ["fixed", "float", "q-format"]
+[build-system]
+requires = ["maturin>=0.12,<0.13"]
+build-backend = "maturin"
 
-packages = [
-    {include = "fixed2float"},
-    #{include = "tests", format = "sdist"},
-]
-include = [
-    # C extensions must be included in the wheel distributions
-    {path = "fixed2float/*.so", format = "wheel"},
-]
+[project]
+name = "fixed2float"
+# dependencies = [
+#   "numpy >= 1.16.0",
+#   "typing_extensions >= 4.0.0; python_version < '3.10'",
+# ]
+requires-python = ">=3.7"
+
+[project.optional-dependencies]
+# pyarrow = ["pyarrow>=4.0.*"]
+
+[tool.isort]
+profile = "black"
+
+[tool.mypy]
+# disallow_untyped_defs = true
+# warn_unused_ignores = true
+# show_error_codes = true
+# files = ["fixed2float", "tests"]
+
+[[tool.mypy.overrides]]
+
+
+[tool.coverage.report]
+# exclude_lines = ["pragma: no cover", "@overload"]

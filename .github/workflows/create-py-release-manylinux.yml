@@ -1,0 +1,21 @@
+name: Create Python release manylinux
+
+on:
+  push:
+    # Sequence of patterns matched against refs/tags
+    tags:
+      - 'v*' # Push events to matching v*, i.e. v1.0, v20.15.10
+      # - 'fixed2float-v*' # Push events to matching fixed2float-v*, i.e. fixed2float-v1.0, fixed2float-v20.15.10
+jobs:
+  build_manylinux:
+    name: Create Release manylinux
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Publish wheel
+        uses: docker://konstin2/maturin:latest
+        env:
+          MATURIN_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
+        with:
+          entrypoint: /bin/bash
+          args: .github/deploy_manylinux.sh
