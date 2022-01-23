@@ -17,10 +17,10 @@ fn mant(bits: u64) -> u64 {
 
 /// Convert `x` f64 into fixed point format `Qm.n`, if possible.
 /// ```rust
-/// use fixed2float as f2f;
-/// assert_eq!(f2f::to_fixed(1.5, 1, 3).unwrap(), (0b1100, true));
+/// use fixed2float::to_fixed;
+/// assert_eq!(to_fixed(1.5, 1, 3).unwrap(), (0b1100, true));
 /// ```
-pub fn to_fixed(x: f64, m: u8, n: u8) -> Result<(u64, bool), String> {
+pub fn to_fixed(x: f64, m: i32, n: i32) -> Result<(u128, bool), String> {
     let f64_bits = x.to_bits();
 
     let exp = exp(f64_bits) as i32 - EXP_BIAS as i32;
@@ -31,7 +31,7 @@ pub fn to_fixed(x: f64, m: u8, n: u8) -> Result<(u64, bool), String> {
                               // is where _you_ interpret the point to be, which depends on `exp` at this point.
                               // now all you have to do is slice out the fractional and non-fractional parts individually.
 
-    let fractional_part = bits & mask((MANT_SIZE as i32 - exp as i32) as u64);
+    let fractional_part = (bits & mask((MANT_SIZE as i32 - exp as i32) as u64));
     let integer_part = bits >> ((MANT_SIZE as i32 - exp as i32) as u64);
 
     // now, depending on `m` and `n` you need to figure out whether rouding occurs.
@@ -58,38 +58,92 @@ pub fn to_fixed(x: f64, m: u8, n: u8) -> Result<(u64, bool), String> {
         fractional_part & mask(((MANT_SIZE as i32 - exp as i32) - (n as i32 + 1)) as u64) != 0;
 
     let is_exact = !sticky_bit && !round_bit;
-    let ans = (integer_part_on_m_bits << n) + fractional_part_on_n_bits;
-    Ok((ans, is_exact))
+    let ans = ((integer_part_on_m_bits << n) + fractional_part_on_n_bits);
+    Ok((ans.into(), is_exact))
 }
 
 /// Convert `bits` in the format `Qm.n` into a real number.
 /// ```rust
-/// use fixed2float as f2f;
-/// assert_eq!(f2f::to_float(0x13021, 12, 8), 304.12890625);
+/// use fixed2float::to_float_str;
+/// assert_eq!(to_float_str("00010011000000100001", 12, 8), Ok(304.12890625));
 /// ```
-pub fn to_float(mut bits: u64, m: u8, n: u8) -> f64 {
+pub fn to_float_str(bits: &str, m: i32, n: i32) -> Result<f64, String> {
+    let bits_size = bits.len() as i32;
+    if bits_size != m + n {
+        return Err(format!(
+            "`bits` size  does not match the `m` + `n` size you specified. {} != {}",
+            bits_size,
+            m + n
+        ));
+    }
+
     let mut ans = 0.0;
 
-    for i in (1..n + 1).rev() {
-        ans += (bits & 1) as f64 / (1 << i) as f64;
-        bits >>= 1;
+    for i in (1..=n).rev() {
+        let bit = bits
+            .chars()
+            .nth(((m - 1 + i) as u16).into())
+            .unwrap()
+            .to_digit(2)
+            .unwrap(); //. parse::<i32>().unwrap();
+        ans += bit as f64 / (1 << i) as f64;
     }
 
     for i in 0..m {
-        ans += (bits & 1) as f64 * (1 << i) as f64;
+        let bit = bits
+            .chars()
+            .nth(((m - 1 - i) as u16).into())
+            .unwrap()
+            .to_digit(2)
+            .unwrap();
+        ans += bit as f64 * (1 << i) as f64;
+    }
+
+    Ok(ans)
+}
+
+/// Convert `bits` in the format `Qm.n` into a real number.
+/// ```rust
+/// use fixed2float::to_float;
+/// assert_eq!(to_float(0x13021,20, 12, 8), Ok(304.12890625));
+/// ```
+pub fn to_float(mut bits: i64, size: i32, m: i32, n: i32) -> Result<f64, String> {
+    if size != m + n {
+        return Err(format!(
+            "`bits` size  does not match the `m` + `n` size you specified. {} != {}",
+            size,
+            m + n
+        ));
+    }
+
+    let mut ans = 0.0;
+
+    for i in (1..=n).rev() {
+        ans += (bits & 1) as f64 / 2_u64.pow(i as u32) as f64; //  (1 << i) as f64;
+        bits >>= 1;
+    }
+    for i in 0..m {
+        ans += (bits & 1) as f64 * 2_u64.pow(i as u32) as f64; // (1 << i) as f64;
         bits >>= 1;
     }
 
-    ans
+    Ok(ans)
 }
 
 #[cfg(test)]
 mod tests {
-    use super::{to_fixed, to_float};
+    use super::{to_fixed, to_float, to_float_str};
 
     #[test]
     fn test_to_float() {
-        assert_eq!(to_float(0b1010000010110000, 1, 15), 1.25537109375);
+        assert_eq!(to_float(0b1010000010110000, 16, 1, 15), Ok(1.25537109375));
+        assert_eq!(to_float(0b1010000010110000, 16, 1, 14).is_err(), true);
+        assert_eq!(to_float(0b1010000010110000, 16, 1, 15).is_err(), false);
+        assert_eq!(to_float(0b1010000010110000, 16, 1, 16).is_err(), true);
+        assert_eq!(to_float_str("1010000010110000", 1, 15), Ok(1.25537109375));
+        assert_eq!(to_float_str("1010000010110000", 1, 14).is_err(), true);
+        assert_eq!(to_float_str("1010000010110000", 1, 15).is_err(), false);
+        assert_eq!(to_float_str("1010000010110000", 1, 16).is_err(), true);
     }
 
     #[test]
@@ -106,6 +160,9 @@ mod tests {
     fn back_and_forth() {
         let x = 10.25;
         let (m, n) = (21, 3);
-        assert_eq!(to_float(to_fixed(x, m, n).unwrap().0, m, n), x);
+        assert_eq!(
+            to_float(to_fixed(x, m, n).unwrap().0 as i64, 24, m, n).unwrap(),
+            x
+        );
     }
 }

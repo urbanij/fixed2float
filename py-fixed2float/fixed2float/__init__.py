@@ -1,4 +1,4 @@
-from .fixed2float import to_float
+from .fixed2float import to_float, to_float_str
 
 __ANSI_RESET_COLOR = "\033[0m"
 __ANSI_BLACK = "\033[37;40m"  # non bold, black background, white foreground
