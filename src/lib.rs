@@ -3,7 +3,7 @@ const MANT_SIZE: u64 = 52;
 const ES: u64 = 11;
 const EXP_BIAS: u64 = (1 << (ES - 1)) - 1;
 
-fn mask(size: u64) -> u64 {
+fn mask(size: u128) -> u128 {
     (1 << size) - 1
 }
 
@@ -31,34 +31,40 @@ pub fn to_fixed(x: f64, m: i32, n: i32) -> Result<(u128, bool), String> {
                               // is where _you_ interpret the point to be, which depends on `exp` at this point.
                               // now all you have to do is slice out the fractional and non-fractional parts individually.
 
-    let fractional_part = (bits & mask((MANT_SIZE as i32 - exp as i32) as u64));
+    let fractional_part = bits as u128 & mask((MANT_SIZE as i32 - exp as i32) as u128);
     let integer_part = bits >> ((MANT_SIZE as i32 - exp as i32) as u64);
 
     // now, depending on `m` and `n` you need to figure out whether rouding occurs.
     // if that's the case, that information is reported back to the user via the `is_exact` flag.
     // whereas if the integer part does not fit into `m` bits you return the Err variant instead.
 
-    let integer_part_on_m_bits = integer_part & mask(m as u64);
+    let integer_part_on_m_bits = integer_part as u128 & mask(m as u128);
 
-    let mut fractional_part_on_n_bits = (fractional_part
-        & (mask(n as u64) << ((MANT_SIZE as i32 - exp as i32) - n as i32)))
-        >> ((MANT_SIZE as i32 - exp as i32) - n as i32);
+    let mut fractional_part_on_n_bits = match (MANT_SIZE as i32 - exp as i32 - n as i32) >= 0 {
+        true => (fractional_part >> (MANT_SIZE as i32 - exp as i32 - n as i32)) & (mask(n as u128)),
+        _ => (fractional_part << (-(MANT_SIZE as i32 - exp as i32 - n as i32))) & mask(n as u128),
+    };
 
-    if integer_part_on_m_bits < integer_part {
-        return Err("Integer field does not fit into `m`.".to_string());
+    if integer_part_on_m_bits < integer_part as u128 {
+        return Err(format!("Integer field does not fit into `m`."));
     }
 
-    let round_bit = fractional_part >> ((MANT_SIZE as i32 - exp as i32) - (n as i32 + 1)) & 1 != 0;
+    let round_bit = match ((MANT_SIZE as i32 - exp as i32) - (n as i32 + 1)) >= 0 {
+        true => fractional_part >> ((MANT_SIZE as i32 - exp as i32) - (n as i32 + 1)) & 1 != 0,
+        _ => fractional_part << (-((MANT_SIZE as i32 - exp as i32) - (n as i32 + 1))) != 0,
+    };
 
     if round_bit {
         fractional_part_on_n_bits += 1;
     }
 
-    let sticky_bit =
-        fractional_part & mask(((MANT_SIZE as i32 - exp as i32) - (n as i32 + 1)) as u64) != 0;
+    let sticky_bit = match (MANT_SIZE as i32 - exp as i32 - n as i32 + 1) >= 0 {
+        true => fractional_part & mask((MANT_SIZE as i32 - exp as i32 - n as i32 + 1) as u128) != 0,
+        _ => false,
+    };
 
     let is_exact = !sticky_bit && !round_bit;
-    let ans = ((integer_part_on_m_bits << n) + fractional_part_on_n_bits);
+    let ans = (integer_part_on_m_bits << n) + fractional_part_on_n_bits;
     Ok((ans.into(), is_exact))
 }
 
