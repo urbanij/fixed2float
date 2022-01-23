@@ -31,6 +31,10 @@ pip install fixed2float
 See `example.py` or `example/basic.rs`
 
 
+### Screencast
+
+[![asciicast](https://asciinema.org/a/463661.svg)](https://asciinema.org/a/463661)
+
 ### Similar projects
 
 - javascripts' [fixed2float](https://www.npmjs.com/package/fixed2float)
@@ -38,4 +42,4 @@ See `example.py` or `example/basic.rs`
 
 ---
 
-\*: sign is discarded here
+\*: sign is omitted here
