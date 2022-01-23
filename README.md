@@ -1,3 +1,6 @@
+[![Crates.io](https://img.shields.io/crates/v/fixed2float)](https://crates.io/crates/fixed2float)
+[![PyPI](https://img.shields.io/pypi/v/fixed2float)](https://pypi.org/project/fixed2float/)
+
 # fixed2float
 
 Simple utility for fixed point to real number conversions, using [the Q notation](https://en.wikipedia.org/wiki/Fixed-point_arithmetic#Notations)*.

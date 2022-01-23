@@ -8,7 +8,7 @@ documentation = ""
 # homepage = ""
 readme = "README.md"
 repository = "https://github.com/urbanij/fixed2float"
-description = "Utility for fixed point to floating point conversion"
+description = "Fixed point to floating point conversion utility"
 
 
 
