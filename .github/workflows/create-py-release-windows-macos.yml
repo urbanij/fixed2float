@@ -37,6 +37,9 @@ jobs:
           run: |
             rustup override set nightly-2022-01-01
             # export RUSTFLAGS='-C target-feature=+fxsr,+sse,+sse2,+sse3'
+            rm py-fixed2float/README.md
+            cp README.md py-fixed2float/README.md
+            cd py-fixed2float
             maturin publish \
             --no-sdist \
             --skip-existing \
