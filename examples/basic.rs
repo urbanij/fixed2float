@@ -17,8 +17,8 @@ fn main() {
 
     let fp1 = FixedPoint::new(0b10010011, 6, 2, true); // 36.75
 
-    println!("{:?} {}", fp1, fp1.eval());
+    println!("{:?} {} {}", fp1, fp1, fp1.eval());
 
-    let fp1_sliced = fp1[10..2];
-    println!("{:?}", fp1_sliced.val);
+    // let fp1_sliced = fp1.index(7..0);
+    // println!("{:?}", fp1_sliced);
 }
