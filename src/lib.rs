@@ -1,3 +1,6 @@
+mod fp;
+pub use fp::FixedPoint;
+
 const SIZE: u64 = 64;
 const MANT_SIZE: u64 = 52;
 const ES: u64 = 11;
@@ -17,10 +20,22 @@ fn mant(bits: u64) -> u64 {
 
 /// Convert `x` (f64) into fixed point format (Qm.n), if possible.
 /// ```rust
-/// use fixed2float::to_fixed;
-/// assert_eq!(to_fixed(1.5, 1, 3).unwrap(), (0b1100, true));
+/// use fixed2float::{to_fixed, FixedPoint};
+/// assert_eq!(
+///     to_fixed(1.5, 1, 3),
+///     Ok(
+///         FixedPoint {
+///             val: 0b1100,
+///             m: 1,
+///             n: 3,
+///             is_exact: true,
+///         }
+///     )
+/// );
+/// assert_eq!(to_fixed(1.5, 1, 3).unwrap().val, 0b1100);
+/// assert_eq!(to_fixed(1.5, 1, 3).unwrap().is_exact, true);
 /// ```
-pub fn to_fixed(x: f64, m: i32, n: i32) -> Result<(u128, bool), String> {
+pub fn to_fixed(x: f64, m: i32, n: i32) -> Result<FixedPoint, String> {
     let f64_bits = x.to_bits();
 
     let exp = exp(f64_bits) as i32 - EXP_BIAS as i32;
@@ -65,7 +80,12 @@ pub fn to_fixed(x: f64, m: i32, n: i32) -> Result<(u128, bool), String> {
 
     let is_exact = !sticky_bit && !round_bit;
     let ans = (integer_part_on_m_bits << n) + fractional_part_on_n_bits;
-    Ok((ans, is_exact))
+    Ok(FixedPoint {
+        val: ans,
+        m,
+        n,
+        is_exact,
+    })
 }
 
 /// Compute the real value represented by `bits` (str) in the form Qm.n.
@@ -113,7 +133,7 @@ pub fn to_float_str(bits: &str, m: i32, n: i32) -> Result<f64, String> {
 /// use fixed2float::to_float;
 /// assert_eq!(to_float(0x13021, 20, 12, 8), Ok(304.12890625));
 /// ```
-pub fn to_float(mut bits: i64, size: i32, m: i32, n: i32) -> Result<f64, String> {
+pub fn to_float(mut bits: u128, size: i32, m: i32, n: i32) -> Result<f64, String> {
     if size != m + n {
         return Err(format!(
             "`bits` size  does not match the `m` + `n` size you specified. {} != {}",
@@ -154,22 +174,51 @@ mod tests {
 
     #[test]
     fn test_to_fixed() {
-        assert_eq!(to_fixed(10.25, 4, 3), Ok((82, true)));
+        use super::fp::FixedPoint;
+
+        assert_eq!(to_fixed(10.25, 4, 3), Ok(FixedPoint::new(82, 4, 3, true)));
         assert_eq!(to_fixed(10.25, 3, 3).is_err(), true);
-        assert_eq!(to_fixed(10.25, 8, 3), Ok((82, true)));
-        assert_eq!(to_fixed(10.25, 8, 2), Ok((41, true)));
-        assert_eq!(to_fixed(10.25, 8, 1), Ok((21, false)));
-        assert_eq!(to_fixed(10.25, 8, 0), Ok((10, false)));
-        assert_eq!(to_fixed(0.0078125, 1, 1), Ok((0, false)));
-        assert_eq!(to_fixed(0.0078125, 1, 2), Ok((0, false)));
-        assert_eq!(to_fixed(0.0078125, 1, 3), Ok((0, false)));
-        assert_eq!(to_fixed(0.0078125, 1, 4), Ok((0, false)));
-        assert_eq!(to_fixed(0.0078125, 1, 5), Ok((0, false)));
-        assert_eq!(to_fixed(0.0078125, 1, 6), Ok((1, false)));
-        assert_eq!(to_fixed(0.0078125, 1, 7), Ok((1, true)));
-        assert_eq!(to_fixed(0.0078125, 1, 8), Ok((2, true)));
-        assert_eq!(to_fixed(0.0078125, 1, 9), Ok((4, true)));
-        assert_eq!(to_fixed(1.387, 2, 15).unwrap().0, 45449);
+        assert_eq!(to_fixed(10.25, 8, 3), Ok(FixedPoint::new(82, 8, 3, true)));
+        assert_eq!(to_fixed(10.25, 8, 2), Ok(FixedPoint::new(41, 8, 2, true)));
+        assert_eq!(to_fixed(10.25, 8, 1), Ok(FixedPoint::new(21, 8, 1, false)));
+        assert_eq!(to_fixed(10.25, 8, 0), Ok(FixedPoint::new(10, 8, 0, false)));
+        assert_eq!(
+            to_fixed(0.0078125, 1, 1),
+            Ok(FixedPoint::new(0, 1, 1, false))
+        );
+        assert_eq!(
+            to_fixed(0.0078125, 1, 2),
+            Ok(FixedPoint::new(0, 1, 2, false))
+        );
+        assert_eq!(
+            to_fixed(0.0078125, 1, 3),
+            Ok(FixedPoint::new(0, 1, 3, false))
+        );
+        assert_eq!(
+            to_fixed(0.0078125, 1, 4),
+            Ok(FixedPoint::new(0, 1, 4, false))
+        );
+        assert_eq!(
+            to_fixed(0.0078125, 1, 5),
+            Ok(FixedPoint::new(0, 1, 5, false))
+        );
+        assert_eq!(
+            to_fixed(0.0078125, 1, 6),
+            Ok(FixedPoint::new(1, 1, 6, false))
+        );
+        assert_eq!(
+            to_fixed(0.0078125, 1, 7),
+            Ok(FixedPoint::new(1, 1, 7, true))
+        );
+        assert_eq!(
+            to_fixed(0.0078125, 1, 8),
+            Ok(FixedPoint::new(2, 1, 8, true))
+        );
+        assert_eq!(
+            to_fixed(0.0078125, 1, 9),
+            Ok(FixedPoint::new(4, 1, 9, true))
+        );
+        assert_eq!(to_fixed(1.387, 2, 15).unwrap().val, 45449);
         assert_eq!(to_fixed(4.3, 2, 15).is_err(), true);
     }
 
@@ -178,7 +227,7 @@ mod tests {
         let x = 10.25;
         let (m, n) = (21, 3);
         assert_eq!(
-            to_float(to_fixed(x, m, n).unwrap().0 as i64, 24, m, n).unwrap(),
+            to_float(to_fixed(x, m, n).unwrap().val as u128, 24, m, n).unwrap(),
             x
         );
     }

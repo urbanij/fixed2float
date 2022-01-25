@@ -23,7 +23,7 @@ fn to_fixed(x: f64, m: i32, n: i32) -> PyResult<Option<(u128, bool)>> {
 }
 
 #[pyfunction]
-fn to_float(bits: i64, size: i32, m: i32, n: i32) -> PyResult<Option<f64>> {
+fn to_float(bits: u128, size: i32, m: i32, n: i32) -> PyResult<Option<f64>> {
     let ans = f2f::to_float(bits, size, m, n);
     match ans {
         Ok(x) => Ok(Some(x)),

@@ -1,4 +1,4 @@
-use fixed2float::{to_fixed, to_float, to_float_str};
+use fixed2float::{to_fixed, to_float, to_float_str, FixedPoint};
 
 fn main() {
     let bits = "1010000010110000";
@@ -13,5 +13,12 @@ fn main() {
 
     let x = 10.25;
     let (m, n) = (21, 3);
-    println!("{:?}", to_fixed(x, m, n).unwrap().0);
+    println!("{:?}", to_fixed(x, m, n).unwrap().val);
+
+    let fp1 = FixedPoint::new(0b10010011, 6, 2, true); // 36.75
+
+    println!("{:?} {}", fp1, fp1.eval());
+
+    let fp1_sliced = fp1[10..2];
+    println!("{:?}", fp1_sliced.val);
 }
