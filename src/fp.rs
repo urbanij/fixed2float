@@ -21,7 +21,7 @@ impl FixedPoint {
         to_float(self.val, self.m + self.n, self.m, self.n).unwrap()
     }
 
-    pub fn index(&self, range: std::ops::Range<usize>) -> Result<Self, String> {
+    pub fn index(&self, _range: std::ops::Range<usize>) -> Result<Self, String> {
         //     use super::mask;
 
         //     let (left_idx, right_idx) = (range.start + 1, range.end);
@@ -50,9 +50,9 @@ impl FixedPoint {
     }
 }
 
-impl std::ops::Shl<i32> for FixedPoint {
+impl std::ops::Shl<u32> for FixedPoint {
     type Output = Self;
-    fn shl(self, rhs: i32) -> Self::Output {
+    fn shl(self, rhs: u32) -> Self::Output {
         use super::mask;
         Self {
             val: (self.val << rhs) & mask((self.m + self.n) as u128),
@@ -63,9 +63,9 @@ impl std::ops::Shl<i32> for FixedPoint {
     }
 }
 
-impl std::ops::Shr<i32> for FixedPoint {
+impl std::ops::Shr<u32> for FixedPoint {
     type Output = Self;
-    fn shr(self, rhs: i32) -> Self::Output {
+    fn shr(self, rhs: u32) -> Self::Output {
         use super::mask;
         Self {
             val: (self.val >> rhs) & mask((self.m + self.n) as u128),
@@ -120,15 +120,15 @@ impl std::ops::Mul for FixedPoint {
 
 impl std::fmt::Debug for FixedPoint {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let mut ans;
 
-        let ANSI_RESET_COLOR = "\x1b[0m";
-        let ANSI_BLACK = "\x1b[37;40m"; // non bold, black background, white foreground
-        let ANSI_MAGENTA = "\x1b[45m"; // non bold, magenta background, black foreground
+
+        const ANSI_RESET_COLOR: &str = "\x1b[0m";
+        const ANSI_BLACK: &str = "\x1b[37;40m"; // non bold, black background, white foreground
+        const ANSI_MAGENTA: &str = "\x1b[45m"; // non bold, magenta background, black foreground
 
         let bits = format!("{:0width$b}", self.val, width = (self.m + self.n) as usize);
 
-        ans = format!(
+        let ans = format!(
             "{ANSI_MAGENTA}{int}{ANSI_BLACK}{frac}{ANSI_RESET_COLOR}",
             int = &bits[..self.m as usize],
             frac = &bits[self.m as usize..],
@@ -140,7 +140,7 @@ impl std::fmt::Debug for FixedPoint {
 
 impl std::fmt::Display for FixedPoint {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let mut ans;
+        let ans;
 
         ans = format!("FP<{},{}>({})", self.m, self.n, self.val);
 
