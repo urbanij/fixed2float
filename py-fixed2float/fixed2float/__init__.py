@@ -1,6 +1,6 @@
-from .fixed2float import to_float, to_float_str
-from .fixed2float import FixedPoint
-from .fixed2float import version as __version
+from .__fixed2float import to_float, to_float_str
+from .__fixed2float import FixedPoint
+from .__fixed2float import version as __version
 
 __version__ = __version()
 
