@@ -1,6 +1,6 @@
-from .__fixed2float import to_float, to_float_str
-from .__fixed2float import FixedPoint
-from .__fixed2float import version as __version
+from .fixed2float import to_float, to_float_str
+from .fixed2float import FixedPoint
+from .fixed2float import version as __version
 
 __version__ = __version()
 
@@ -18,7 +18,8 @@ def to_fixed(x, m, n):
 #         return FixedPoint(ans[0], m, n, ans[1])
 
 
-# __all__ = [
-#     "to_fixed",
-#     "to_float",
-# ]
+__all__ = [
+    "to_fixed",
+    "to_float",
+    "FixedPoint",
+]

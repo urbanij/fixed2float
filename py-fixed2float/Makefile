@@ -8,7 +8,7 @@ endif
 
 all:
 	cargo build --release
-	cp $(CARGO_TARGET_DIR)/release/libfixed2float.$(EXT) fixed2float/__fixed2float.so
+	cp $(CARGO_TARGET_DIR)/release/libfixed2float.$(EXT) fixed2float/fixed2float.so
 
 
 # pre-commit:

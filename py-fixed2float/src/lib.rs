@@ -128,7 +128,7 @@ fn to_float_str(bits: &str, m: i32, n: i32) -> PyResult<Option<f64>> {
 
 /// A Python module implemented in Rust.
 #[pymodule]
-fn __fixed2float(_py: Python, m: &PyModule) -> PyResult<()> {
+fn fixed2float(_py: Python, m: &PyModule) -> PyResult<()> {
     m.add_class::<FixedPoint>()?;
     m.add_function(wrap_pyfunction!(to_fixed, m)?)?;
     m.add_function(wrap_pyfunction!(to_float, m)?)?;
