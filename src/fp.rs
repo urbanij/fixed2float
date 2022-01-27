@@ -128,8 +128,13 @@ impl std::fmt::Debug for FixedPoint {
 
         let bits = format!("{:0width$b}", self.val, width = (self.m + self.n) as usize);
 
+        let dots = match self.is_exact {
+            true => "...",
+            _ => "",
+        };
+
         let ans = format!(
-            "{ANSI_MAGENTA}{int}{ANSI_BLACK}{frac}{ANSI_RESET_COLOR}",
+            "{ANSI_MAGENTA}{int}{ANSI_BLACK}{frac}{ANSI_RESET_COLOR}{dots}",
             int = &bits[..self.m as usize],
             frac = &bits[self.m as usize..],
         );
