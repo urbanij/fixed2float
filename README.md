@@ -26,6 +26,7 @@ pip install fixed2float
 
 See [example.py](https://github.com/urbanij/fixed2float/blob/main/py-fixed2float/example.py) (Python) or the [examples folder](https://github.com/urbanij/fixed2float/tree/main/examples) (Rust) or this online notebook:
 
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/urbanij/fixed2float/HEAD?labpath=py-fixed2float%2Fnotebook.ipynb)
 
 
 <!-- ### Screencast -->
