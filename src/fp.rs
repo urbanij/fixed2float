@@ -21,6 +21,10 @@ impl FixedPoint {
         to_float(self.val, self.m + self.n, self.m, self.n).unwrap()
     }
 
+    pub fn q_fmt(&self) -> String {
+        let (m, n) = (self.m, self.n);
+        format!("Q{m}.{n}")
+    }
     pub fn index(&self, _range: std::ops::Range<usize>) -> Result<Self, String> {
         //     use super::mask;
 
@@ -120,8 +124,6 @@ impl std::ops::Mul for FixedPoint {
 
 impl std::fmt::Debug for FixedPoint {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-
-
         const ANSI_RESET_COLOR: &str = "\x1b[0m";
         const ANSI_BLACK: &str = "\x1b[37;40m"; // non bold, black background, white foreground
         const ANSI_MAGENTA: &str = "\x1b[45m"; // non bold, magenta background, black foreground
@@ -129,7 +131,7 @@ impl std::fmt::Debug for FixedPoint {
         let bits = format!("{:0width$b}", self.val, width = (self.m + self.n) as usize);
 
         let dots = match self.is_exact {
-            true => "...",
+            false => "...",
             _ => "",
         };
 
@@ -147,7 +149,8 @@ impl std::fmt::Display for FixedPoint {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let ans;
 
-        ans = format!("FP<{},{}>({})", self.m, self.n, self.val);
+        ans = format!("Q<{},{}>({})", self.m, self.n, self.val);
+        // ans = self.q_fmt();
 
         write!(f, "{}", ans)
     }
