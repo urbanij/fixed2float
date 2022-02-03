@@ -24,7 +24,8 @@ pip install fixed2float
 
 ### Examples
 
-See [`example.py`](https://github.com/urbanij/fixed2float/blob/main/py-fixed2float/example.py) (Python) or the [examples folder](https://github.com/urbanij/fixed2float/tree/main/examples) (Rust).
+See [example.py](https://github.com/urbanij/fixed2float/blob/main/py-fixed2float/example.py) (Python) or the [examples folder](https://github.com/urbanij/fixed2float/tree/main/examples) (Rust) or this online notebook:
+
 
 
 <!-- ### Screencast -->
@@ -34,5 +35,4 @@ See [`example.py`](https://github.com/urbanij/fixed2float/blob/main/py-fixed2flo
 
 ### Similar projects
 
-- javascripts' [fixed2float](https://www.npmjs.com/package/fixed2float)
-
+- ameetgohil's [fixed2float](https://www.npmjs.com/package/fixed2float) in javascript
