@@ -16,4 +16,4 @@ all:
 
 clean:
 	rm -rf dist *.so __pycache__ .pytest_cache
-	cd fixed2float && rm -rf *.so
+	cd fixed2float && rm -rf *.so __pycache__
