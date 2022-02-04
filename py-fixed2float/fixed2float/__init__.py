@@ -9,7 +9,9 @@ __version__ = __version()
 
 def to_fixed(x, m, n):
     from .fixed2float import to_fixed as _to_fixed
+
     return _to_fixed(x, m, n)
+
 
 #     ans = to_fixed(x, m, n)
 #     if ans == None:

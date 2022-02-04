@@ -1,4 +1,5 @@
 import fixed2float as f2f
+
 # print(f"{f2f.__version__}")
 
 fp1 = f2f.to_fixed(1.25, 4, 3)

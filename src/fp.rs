@@ -130,10 +130,7 @@ impl std::fmt::Debug for FixedPoint {
 
         let bits = format!("{:0width$b}", self.val, width = (self.m + self.n) as usize);
 
-        let dots = match self.is_exact {
-            false => "...",
-            _ => "",
-        };
+        let dots = if self.is_exact { "" } else { "..." };
 
         let ans = format!(
             "{ANSI_MAGENTA}{int}{ANSI_BLACK}{frac}{ANSI_RESET_COLOR}{dots}",
