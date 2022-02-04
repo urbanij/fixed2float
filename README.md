@@ -28,7 +28,6 @@ See [example.py](https://github.com/urbanij/fixed2float/blob/main/py-fixed2float
 
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/urbanij/fixed2float/HEAD?labpath=py-fixed2float%2Fexamples%2Fnotebook.ipynb)
 
-
 <!-- ### Screencast -->
 
 <!-- [![asciicast](https://asciinema.org/a/463661.svg)](https://asciinema.org/a/463661) -->
