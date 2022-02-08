@@ -1,8 +1,8 @@
 use pyo3::prelude::*;
 use pyo3::wrap_pyfunction;
 
-use fixed2float as f2f;
 use f2f::FixedPoint;
+use fixed2float as f2f;
 
 const VERSION: &str = env!("CARGO_PKG_VERSION");
 
@@ -59,7 +59,6 @@ impl Fx {
         self.fp.b - self.fp.m
     }
 
-
     pub fn eval(&self) -> f64 {
         self.fp.eval()
     }
@@ -87,8 +86,11 @@ impl Fx {
     fn __repr__(&self) -> String {
         format!("{:?}", self.fp)
     }
-}
 
+    pub fn as_str(&self) -> String {
+        format!("{}", self.fp)
+    }
+}
 
 #[pyfunction]
 #[allow(non_snake_case)]

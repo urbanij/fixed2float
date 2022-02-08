@@ -122,10 +122,7 @@ impl std::fmt::Debug for Fx {
 impl std::fmt::Display for Fx {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let ans;
-
-        ans = format!("Fx{}.{}({})", self.m, self.b, self.val);
-        // ans = self.q_fmt();
-
+        ans = format!("Fx<{},{}>({})", self.m, self.b, self.val);
         write!(f, "{}", ans)
     }
 }

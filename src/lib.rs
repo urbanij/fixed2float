@@ -1,3 +1,8 @@
+//!
+//! Fixed point to float an vice versa conversion utility.
+//! Use the Q (Qm.n) and the VisSim (Fxm.b) [notations](https://en.wikipedia.org/wiki/Fixed-point_arithmetic#Notations).
+//! 
+//! 
 mod fixed_point;
 pub use fixed_point::FixedPoint;
 pub use fixed_point::{to_Fx, to_Q};
