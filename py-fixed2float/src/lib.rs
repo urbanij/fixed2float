@@ -2,6 +2,7 @@ use pyo3::prelude::*;
 use pyo3::wrap_pyfunction;
 
 use fixed2float as f2f;
+use f2f::FixedPoint;
 
 const VERSION: &str = env!("CARGO_PKG_VERSION");
 
@@ -10,27 +11,27 @@ fn version() -> &'static str {
     VERSION
 }
 
-#[pyclass(name = "FixedPoint")]
+#[pyclass(name = "Fx")]
 // #[repr(transparent)]
 #[derive(Clone)]
-pub struct FixedPoint {
+pub struct Fx {
     #[pyo3(get)]
     pub val: u128,
     #[pyo3(get)]
     pub m: i32,
     #[pyo3(get)]
-    pub n: i32,
+    pub b: i32,
     #[pyo3(get)]
     pub is_exact: bool,
-    pub fp: f2f::FixedPoint,
+    pub fp: f2f::Fx,
 }
 
-impl From<f2f::FixedPoint> for FixedPoint {
-    fn from(fp: f2f::FixedPoint) -> Self {
+impl From<f2f::Fx> for Fx {
+    fn from(fp: f2f::Fx) -> Self {
         Self {
             val: fp.val,
             m: fp.m,
-            n: fp.n,
+            b: fp.b,
             is_exact: fp.is_exact,
             fp,
         }
@@ -38,21 +39,26 @@ impl From<f2f::FixedPoint> for FixedPoint {
 }
 
 #[pymethods]
-impl FixedPoint {
+impl Fx {
     #[new]
-    fn new(val: u128, m: i32, n: i32) -> Self {
+    fn new(val: u128, m: i32, b: i32) -> Self {
         Self {
             val,
             m,
-            n,
+            b,
             is_exact: true,
-            fp: f2f::FixedPoint::new(val, m, n, true),
+            fp: f2f::Fx::new(val, m, b, true),
         }
     }
 
     pub fn get_val(&self) -> u128 {
         self.fp.val
     }
+
+    pub fn get_frac_bits(&self) -> i32 {
+        self.fp.b - self.fp.m
+    }
+
 
     pub fn eval(&self) -> f64 {
         self.fp.eval()
@@ -83,18 +89,13 @@ impl FixedPoint {
     }
 }
 
-// impl std::ops::Add for FixedPoint {
-//     type Output = Self;
-//     fn add(self, rhs: Self) -> Self::Output {
-
-//     }
-// }
 
 #[pyfunction]
-fn to_fixed(x: f64, m: i32, n: i32) -> PyResult<Option<FixedPoint>> {
-    let ans = f2f::to_fixed(x, m, n);
+#[allow(non_snake_case)]
+fn to_Fx(x: f64, m: i32, b: i32) -> PyResult<Option<Fx>> {
+    let ans = f2f::to_Fx(x, m, b);
     match ans {
-        Ok(fp) => Ok(Some(FixedPoint::from(fp))),
+        Ok(fp) => Ok(Some(Fx::from(fp))),
         Err(e) => {
             println!("{}", e);
             Ok(None)
@@ -129,8 +130,8 @@ fn to_float_str(bits: &str, m: i32, n: i32) -> PyResult<Option<f64>> {
 /// A Python module implemented in Rust.
 #[pymodule]
 fn fixed2float(_py: Python, m: &PyModule) -> PyResult<()> {
-    m.add_class::<FixedPoint>()?;
-    m.add_function(wrap_pyfunction!(to_fixed, m)?)?;
+    m.add_class::<Fx>()?;
+    m.add_function(wrap_pyfunction!(to_Fx, m)?)?;
     m.add_function(wrap_pyfunction!(to_float, m)?)?;
     m.add_function(wrap_pyfunction!(to_float_str, m)?)?;
     m.add_function(wrap_pyfunction!(version, m)?)?;
