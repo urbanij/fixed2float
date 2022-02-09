@@ -10,7 +10,7 @@ license = "MIT"
 readme = "README.md"
 repository = "https://github.com/urbanij/fixed2float"
 description = "Fixed point to floating point conversion utility"
-exclude = [".github", ".gitignore"]
+exclude = [".github", ".gitignore", "Makefile"]
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]

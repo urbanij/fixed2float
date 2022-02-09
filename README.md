@@ -3,7 +3,7 @@
 
 # fixed2float
 
-Simple utility for fixed point to real number conversions, using [the Q notation](https://en.wikipedia.org/wiki/Fixed-point_arithmetic#Notations).
+Simple utility for fixed point to real number conversions, using the VisSim (Fx*m.b*) and Q (Q*m.n*) [notations](https://en.wikipedia.org/wiki/Fixed-point_arithmetic#Notations).
 
 ### Usage
 
