@@ -1,8 +1,8 @@
 //!
 //! Fixed point to float an vice versa conversion utility.
 //! Use the Q (Qm.n) and the VisSim (Fxm.b) [notations](https://en.wikipedia.org/wiki/Fixed-point_arithmetic#Notations).
-//! 
-//! 
+//!
+//!
 mod fixed_point;
 pub use fixed_point::FixedPoint;
 pub use fixed_point::{to_Fx, to_Q};
@@ -27,9 +27,9 @@ fn mant(bits: u64) -> u64 {
 
 /// Convert `x` (f64) into fixed point format (Qm.n), if possible.
 /// ```rust
-/// use fixed2float::{to_fixed, Q};
+/// use fixed2float::{to_Q, Q};
 /// assert_eq!(
-///     to_fixed(1.5, 1, 3),
+///     to_Q(1.5, 1, 3),
 ///     Ok(
 ///         Q {
 ///             val: 0b1100,
@@ -39,8 +39,8 @@ fn mant(bits: u64) -> u64 {
 ///         }
 ///     )
 /// );
-/// assert_eq!(to_fixed(1.5, 1, 3).unwrap().val, 0b1100);
-/// assert_eq!(to_fixed(1.5, 1, 3).unwrap().is_exact, true);
+/// assert_eq!(to_Q(1.5, 1, 3).unwrap().val, 0b1100);
+/// assert_eq!(to_Q(1.5, 1, 3).unwrap().is_exact, true);
 /// ```
 fn to_fixed(x: f64, m: i32, n: i32) -> Result<Q, String> {
     let f64_bits = x.to_bits();
@@ -68,7 +68,10 @@ fn to_fixed(x: f64, m: i32, n: i32) -> Result<Q, String> {
     };
 
     if integer_part_on_m_bits < integer_part as u128 {
-        return Err(format!("Integer field does not fit into `m` {}.", m));
+        return Err(format!(
+            "Error: Integer field does not fit into `m` = {} bits.",
+            m
+        ));
     }
 
     let round_bit = match ((MANT_SIZE as i32 - exp as i32) - (n as i32 + 1)) >= 0 {

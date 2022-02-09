@@ -93,7 +93,6 @@ impl Fx {
 }
 
 #[pyfunction]
-#[allow(non_snake_case)]
 fn to_Fx(x: f64, m: i32, b: i32) -> PyResult<Option<Fx>> {
     let ans = f2f::to_Fx(x, m, b);
     match ans {
