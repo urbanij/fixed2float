@@ -155,7 +155,7 @@ pub fn to_float(mut bits: u128, size: i32, m: i32, n: i32) -> Result<f64, String
     let mut ans = 0.0;
 
     for i in (1..=n).rev() {
-        ans += match 2_i32.checked_pow(i as u32) {
+        ans += match 2_i128.checked_pow(i as u32) {
             None => 0.0,
             Some(v) => (bits & 1) as f64 / v as f64,
         };
