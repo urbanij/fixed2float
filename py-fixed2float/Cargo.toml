@@ -1,6 +1,6 @@
 [package]
 name = "py-fixed2float"
-version = "2.0.1"
+version = "2.0.2"
 authors = ["Francesco Urbani <francescourbanidue@gmail.com>"]
 edition = "2021"
 keywords = ["fixed", "float", "q-format"]

@@ -128,8 +128,8 @@ impl std::fmt::Display for Fx {
 }
 
 #[allow(non_snake_case)]
-pub fn to_Fx(x: f64, m: i32, b: i32) -> Result<Fx, String> {
-    let fp_q = crate::to_fixed(x, m, b - m);
+pub fn to_Fx(x: f64, m: i32, b: i32, round: bool) -> Result<Fx, String> {
+    let fp_q = crate::to_fixed(x, m, b - m, round);
     match fp_q {
         Ok(fp) => Ok(Fx::new(fp.val, fp.m, fp.m + fp.n, fp.is_exact)),
         Err(e) => Err(format!("{}", e)),

@@ -152,6 +152,6 @@ impl std::fmt::Display for Q {
 }
 
 #[allow(non_snake_case)]
-pub fn to_Q(x: f64, m: i32, n: i32) -> Result<Q, String> {
-    crate::to_fixed(x, m, n)
+pub fn to_Q(x: f64, m: i32, n: i32, round: bool) -> Result<Q, String> {
+    crate::to_fixed(x, m, n, round)
 }

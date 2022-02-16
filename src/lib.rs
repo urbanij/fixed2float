@@ -42,7 +42,7 @@ fn mant(bits: u64) -> u64 {
 /// assert_eq!(to_Q(1.5, 1, 3).unwrap().val, 0b1100);
 /// assert_eq!(to_Q(1.5, 1, 3).unwrap().is_exact, true);
 /// ```
-fn to_fixed(x: f64, m: i32, n: i32) -> Result<Q, String> {
+fn to_fixed(x: f64, m: i32, n: i32, round: bool) -> Result<Q, String> {
     let f64_bits = x.to_bits();
 
     let exp = exp(f64_bits) as i32 - EXP_BIAS as i32;
@@ -79,7 +79,7 @@ fn to_fixed(x: f64, m: i32, n: i32) -> Result<Q, String> {
         _ => fractional_part << (-((MANT_SIZE as i32 - exp as i32) - (n as i32 + 1))) != 0,
     };
 
-    if round_bit {
+    if round && round_bit {
         fractional_part_on_n_bits += 1;
     }
 
@@ -191,23 +191,23 @@ mod tests {
     fn test_to_fixed() {
         use super::fixed_point::Q;
 
-        assert_eq!(to_fixed(10.25, 4, 3), Ok(Q::new(82, 4, 3, true)));
-        assert_eq!(to_fixed(10.25, 3, 3).is_err(), true);
-        assert_eq!(to_fixed(10.25, 8, 3), Ok(Q::new(82, 8, 3, true)));
-        assert_eq!(to_fixed(10.25, 8, 2), Ok(Q::new(41, 8, 2, true)));
-        assert_eq!(to_fixed(10.25, 8, 1), Ok(Q::new(21, 8, 1, false)));
-        assert_eq!(to_fixed(10.25, 8, 0), Ok(Q::new(10, 8, 0, false)));
-        assert_eq!(to_fixed(0.0078125, 1, 1), Ok(Q::new(0, 1, 1, false)));
-        assert_eq!(to_fixed(0.0078125, 1, 2), Ok(Q::new(0, 1, 2, false)));
-        assert_eq!(to_fixed(0.0078125, 1, 3), Ok(Q::new(0, 1, 3, false)));
-        assert_eq!(to_fixed(0.0078125, 1, 4), Ok(Q::new(0, 1, 4, false)));
-        assert_eq!(to_fixed(0.0078125, 1, 5), Ok(Q::new(0, 1, 5, false)));
-        assert_eq!(to_fixed(0.0078125, 1, 6), Ok(Q::new(1, 1, 6, false)));
-        assert_eq!(to_fixed(0.0078125, 1, 7), Ok(Q::new(1, 1, 7, true)));
-        assert_eq!(to_fixed(0.0078125, 1, 8), Ok(Q::new(2, 1, 8, true)));
-        assert_eq!(to_fixed(0.0078125, 1, 9), Ok(Q::new(4, 1, 9, true)));
-        assert_eq!(to_fixed(1.387, 2, 15).unwrap().val, 45449);
-        assert_eq!(to_fixed(4.3, 2, 15).is_err(), true);
+        assert_eq!(to_fixed(10.25, 4, 3, true), Ok(Q::new(82, 4, 3, true)));
+        assert_eq!(to_fixed(10.25, 3, 3, true).is_err(), true);
+        assert_eq!(to_fixed(10.25, 8, 3, true), Ok(Q::new(82, 8, 3, true)));
+        assert_eq!(to_fixed(10.25, 8, 2, true), Ok(Q::new(41, 8, 2, true)));
+        assert_eq!(to_fixed(10.25, 8, 1, true), Ok(Q::new(21, 8, 1, false)));
+        assert_eq!(to_fixed(10.25, 8, 0, true), Ok(Q::new(10, 8, 0, false)));
+        assert_eq!(to_fixed(0.0078125, 1, 1, true), Ok(Q::new(0, 1, 1, false)));
+        assert_eq!(to_fixed(0.0078125, 1, 2, true), Ok(Q::new(0, 1, 2, false)));
+        assert_eq!(to_fixed(0.0078125, 1, 3, true), Ok(Q::new(0, 1, 3, false)));
+        assert_eq!(to_fixed(0.0078125, 1, 4, true), Ok(Q::new(0, 1, 4, false)));
+        assert_eq!(to_fixed(0.0078125, 1, 5, true), Ok(Q::new(0, 1, 5, false)));
+        assert_eq!(to_fixed(0.0078125, 1, 6, true), Ok(Q::new(1, 1, 6, false)));
+        assert_eq!(to_fixed(0.0078125, 1, 7, true), Ok(Q::new(1, 1, 7, true)));
+        assert_eq!(to_fixed(0.0078125, 1, 8, true), Ok(Q::new(2, 1, 8, true)));
+        assert_eq!(to_fixed(0.0078125, 1, 9, true), Ok(Q::new(4, 1, 9, true)));
+        assert_eq!(to_fixed(1.387, 2, 15, true).unwrap().val, 45449);
+        assert_eq!(to_fixed(4.3, 2, 15, true).is_err(), true);
     }
 
     #[test]
@@ -215,7 +215,7 @@ mod tests {
         let x = 10.25;
         let (m, n) = (21, 3);
         assert_eq!(
-            to_float(to_fixed(x, m, n).unwrap().val as u128, 24, m, n).unwrap(),
+            to_float(to_fixed(x, m, n, true).unwrap().val as u128, 24, m, n).unwrap(),
             x
         );
     }

@@ -14,7 +14,7 @@ fn main() {
     let x = 10.25;
     let (m, n) = (21, 3);
 
-    let fp0 = to_Q(x, m, n).unwrap();
+    let fp0 = to_Q(x, m, n, true).unwrap();
     println!("{:?}", fp0);
 
     let fp1 = Q::new(0b10010011, 6, 2, true); // 36.75
