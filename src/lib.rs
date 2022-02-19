@@ -29,7 +29,7 @@ fn mant(bits: u64) -> u64 {
 /// ```rust
 /// use fixed2float::{to_Q, Q};
 /// assert_eq!(
-///     to_Q(1.5, 1, 3),
+///     to_Q(1.5, 1, 3, true),
 ///     Ok(
 ///         Q {
 ///             val: 0b1100,
@@ -39,8 +39,8 @@ fn mant(bits: u64) -> u64 {
 ///         }
 ///     )
 /// );
-/// assert_eq!(to_Q(1.5, 1, 3).unwrap().val, 0b1100);
-/// assert_eq!(to_Q(1.5, 1, 3).unwrap().is_exact, true);
+/// assert_eq!(to_Q(1.5, 1, 3, true).unwrap().val, 0b1100);
+/// assert_eq!(to_Q(1.5, 1, 3, true).unwrap().is_exact, true);
 /// ```
 fn to_fixed(x: f64, m: i32, n: i32, round: bool) -> Result<Q, String> {
     let f64_bits = x.to_bits();
