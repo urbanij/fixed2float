@@ -4,6 +4,8 @@ fn main() {
     let bits = "1010000010110000";
     let (m, n) = (1, 15);
 
+    let b1 = to_Q(0.0, 1, 5, true).unwrap();
+
     let x = to_float_str(bits, m, n);
     println!("bits = {} -> {:?}", bits, x);
 

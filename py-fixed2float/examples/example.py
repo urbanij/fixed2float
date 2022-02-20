@@ -22,6 +22,7 @@ print(to_float(0x7F, 8, 2, 6))
 
 print(to_Fx(1 / 1.4375, 1, 16, True).val)
 
+print(to_Fx(0, 1, 5, True).val)
 
 fp3 = Fx(40, 3, 8)
 print(fp3, fp3.as_str())
