@@ -13,8 +13,11 @@ const MANT_SIZE: u64 = 52;
 const ES: u64 = 11;
 const EXP_BIAS: u64 = (1 << (ES - 1)) - 1;
 
-fn mask(size: u128) -> u128 {
-    (1 << size) - 1
+fn mask(size: u32) -> u128 {
+    match 1_u128.checked_shl(size) {
+        Some(v) => v- 1,
+        None => 0,
+    }
 }
 
 fn exp(bits: u64) -> u64 {
@@ -44,14 +47,13 @@ fn mant(bits: u64) -> u64 {
 /// assert_eq!(to_Q(1.5, 1, 3, true).unwrap().is_exact, true);
 /// ```
 fn to_fixed(x: f64, m: i32, n: i32, round: bool) -> Result<Q, String> {
-    
     if x == 0.0 {
         return Ok(Q {
             val: 0,
             m,
             n,
             is_exact: true,
-        })
+        });
     }
 
     let f64_bits = x.to_bits();
@@ -64,30 +66,33 @@ fn to_fixed(x: f64, m: i32, n: i32, round: bool) -> Result<Q, String> {
                               // is where _you_ interpret the point to be, which depends on `exp` at this point.
                               // now all you have to do is slice out the fractional and non-fractional parts individually.
 
-    let fractional_part = bits as u128 & mask((MANT_SIZE as i32 - exp as i32) as u128);
-    let integer_part = bits.checked_shr((MANT_SIZE as i32 - exp as i32) as u32).unwrap_or(0);
+    let fractional_part = bits & mask((MANT_SIZE as i32 - exp as i32) as u32) as u64;
+    let integer_part = bits
+        .checked_shr((MANT_SIZE as i32 - exp as i32) as u32)
+        .unwrap_or(0);
 
     // now, depending on `m` and `n` you need to figure out whether rouding occurs.
     // if that's the case, that information is reported back to the user via the `is_exact` flag.
     // whereas if the integer part does not fit into `m` bits you return the Err variant instead.
 
-    let integer_part_on_m_bits = integer_part as u128 & mask(m as u128);
+    let integer_part_on_m_bits = integer_part & mask(m as u32) as u64;
 
     let mut fractional_part_on_n_bits = match (MANT_SIZE as i32 - exp as i32 - n as i32) >= 0 {
-        true => (fractional_part >> (MANT_SIZE as i32 - exp as i32 - n as i32)) & (mask(n as u128)),
-        _ => (fractional_part << (-(MANT_SIZE as i32 - exp as i32 - n as i32))) & mask(n as u128),
+        true => (fractional_part >> (MANT_SIZE as i32 - exp as i32 - n as i32)) & (mask(n as u32)) as u64,
+        _ => (fractional_part << (-(MANT_SIZE as i32 - exp as i32 - n as i32))) & mask(n as u32) as u64,
     };
 
-    if integer_part_on_m_bits < integer_part as u128 {
+    if integer_part_on_m_bits < integer_part {
         return Err(format!(
             "Error: Integer field does not fit into `m` = {} bits.",
             m
         ));
     }
 
-    let round_bit = match ((MANT_SIZE as i32 - exp as i32) - (n as i32 + 1)) >= 0 {
-        true => fractional_part >> ((MANT_SIZE as i32 - exp as i32) - (n as i32 + 1)) & 1 != 0,
-        _ => fractional_part << (-((MANT_SIZE as i32 - exp as i32) - (n as i32 + 1))) != 0,
+    let _len = (MANT_SIZE as i32 - exp as i32) - (n as i32 + 1);
+    let round_bit = match _len >= 0 {
+        true => fractional_part >> (_len) & 1 != 0,
+        _ => fractional_part.checked_shl(-_len as u32).unwrap_or(0) != 0,
     };
 
     if round && round_bit {
@@ -95,7 +100,7 @@ fn to_fixed(x: f64, m: i32, n: i32, round: bool) -> Result<Q, String> {
     }
 
     let sticky_bit = match (MANT_SIZE as i32 - exp as i32 - n as i32) >= 0 {
-        true => fractional_part & mask((MANT_SIZE as i32 - exp as i32 - n as i32) as u128) != 0,
+        true => fractional_part & mask((MANT_SIZE as i32 - exp as i32 - n as i32) as u32) as u64 != 0,
         _ => false,
     };
 
@@ -154,7 +159,7 @@ pub fn to_float_str(bits: &str, m: i32, n: i32) -> Result<f64, String> {
 /// use fixed2float::to_float;
 /// assert_eq!(to_float(0x13021, 20, 12, 8), Ok(304.12890625));
 /// ```
-pub fn to_float(mut bits: u128, size: i32, m: i32, n: i32) -> Result<f64, String> {
+pub fn to_float(mut bits: u64, size: i32, m: i32, n: i32) -> Result<f64, String> {
     if size != m + n {
         return Err(format!(
             "`bits` size  does not match the `m` + `n` size you specified. {} != {}",
@@ -226,7 +231,7 @@ mod tests {
         let x = 10.25;
         let (m, n) = (21, 3);
         assert_eq!(
-            to_float(to_fixed(x, m, n, true).unwrap().val as u128, 24, m, n).unwrap(),
+            to_float(to_fixed(x, m, n, true).unwrap().val, 24, m, n).unwrap(),
             x
         );
     }

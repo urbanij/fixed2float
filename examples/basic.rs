@@ -1,4 +1,4 @@
-use fixed2float::{to_Q, to_float, to_float_str, FixedPoint, Fx, Q};
+use fixed2float::{to_Fx, to_Q, to_float, to_float_str, FixedPoint, Fx, Q};
 
 fn main() {
     let bits = "1010000010110000";
@@ -27,4 +27,7 @@ fn main() {
 
     // let fp1_sliced = fp1.index(7..0);
     // println!("{:?}", fp1_sliced);
+
+    let fp33 = to_Fx(0.000244140625, 0, 12, true);
+    println!("{fp33:?}");
 }

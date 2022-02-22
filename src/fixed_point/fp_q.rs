@@ -3,14 +3,14 @@ use crate::{mask, to_float};
 
 #[derive(PartialEq, Eq, Clone, Copy)]
 pub struct Q {
-    pub val: u128,
+    pub val: u64,
     pub m: i32,
     pub n: i32,
     pub is_exact: bool,
 }
 
 impl Q {
-    pub fn new(val: u128, m: i32, n: i32, is_exact: bool) -> Self {
+    pub fn new(val: u64, m: i32, n: i32, is_exact: bool) -> Self {
         Self {
             val,
             m,
@@ -58,7 +58,7 @@ impl std::ops::Shl<u32> for Q {
     type Output = Self;
     fn shl(self, rhs: u32) -> Self::Output {
         Self {
-            val: (self.val << rhs) & mask((self.m + self.n) as u128),
+            val: (self.val << rhs) & mask((self.m + self.n) as u32) as u64,
             m: self.m,
             n: self.n,
             is_exact: self.is_exact,
@@ -70,7 +70,7 @@ impl std::ops::Shr<u32> for Q {
     type Output = Self;
     fn shr(self, rhs: u32) -> Self::Output {
         Self {
-            val: (self.val >> rhs) & mask((self.m + self.n) as u128),
+            val: (self.val >> rhs) & mask((self.m + self.n) as u32) as u64,
             m: self.m,
             n: self.n,
             is_exact: self.is_exact,
