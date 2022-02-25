@@ -1,16 +1,16 @@
 use super::FixedPoint;
-use crate::{mask, to_float};
+use crate::{mask, to_float, UInt};
 
 #[derive(PartialEq, Eq, Clone, Copy)]
 pub struct Fx {
-    pub val: u64,
+    pub val: UInt,
     pub m: i32,
     pub b: i32,
     pub is_exact: bool,
 }
 
 impl Fx {
-    pub fn new(val: u64, m: i32, b: i32, is_exact: bool) -> Self {
+    pub fn new(val: UInt, m: i32, b: i32, is_exact: bool) -> Self {
         if b < m {
             panic!("Total num of bits must be larger than num of integer bits.")
         }
@@ -37,7 +37,7 @@ impl std::ops::Shl<u32> for Fx {
     type Output = Self;
     fn shl(self, rhs: u32) -> Self::Output {
         Self {
-            val: (self.val << rhs) & mask((self.b) as u32) as u64,
+            val: (self.val << rhs) & mask((self.b) as u32) as UInt,
             m: self.m,
             b: self.b,
             is_exact: self.is_exact,
@@ -50,7 +50,7 @@ impl std::ops::Shr<u32> for Fx {
     fn shr(self, rhs: u32) -> Self::Output {
         // let val = (self.val >> rhs) & mask((self.b) as u32) as u64;
         let val = match self.val.checked_shr(rhs) {
-            Some(v) => v & mask((self.b) as u32) as u64,
+            Some(v) => v & mask((self.b) as u32) as UInt,
             None => 0,
         };
 
