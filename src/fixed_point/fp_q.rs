@@ -1,3 +1,5 @@
+use colored::Colorize;
+
 use super::FixedPoint;
 use crate::{mask, to_float, UInt};
 
@@ -122,18 +124,18 @@ impl std::ops::Mul for Q {
 
 impl std::fmt::Debug for Q {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        const ANSI_RESET_COLOR: &str = "\x1b[0m";
-        const ANSI_BLACK: &str = "\x1b[37;40m"; // bold, black background, white foreground
-        const ANSI_MAGENTA: &str = "\x1b[45m"; // non bold, magenta background, black foreground
+        // const ANSI_RESET_COLOR: &str = "\x1b[0m";
+        // const ANSI_BLACK: &str = "\x1b[37;40m"; // bold, black background, white foreground
+        // const ANSI_MAGENTA: &str = "\x1b[45m"; // non bold, magenta background, black foreground
 
         let bits = format!("{:0width$b}", self.val, width = (self.m + self.n) as usize);
 
         let dots = if self.is_exact { "" } else { "..." };
 
         let ans = format!(
-            "{ANSI_MAGENTA}{int}{ANSI_BLACK}{frac}{dots}{ANSI_RESET_COLOR}",
-            int = &bits[..self.m as usize],
-            frac = &bits[self.m as usize..],
+            "{int}{frac}{dots}",
+            int = &bits[..self.m as usize].on_magenta().bright_white(),
+            frac = &bits[self.m as usize..].on_black().white(),
         );
 
         write!(f, "{}", ans)

@@ -5,6 +5,7 @@ fn main() {
     let (m, n) = (1, 15);
 
     let b1 = to_Q(0.0, 1, 5, true).unwrap();
+    println!("{b1:?}");
 
     let x = to_float_str(bits, m, n);
     println!("bits = {} -> {:?}", bits, x);
