@@ -1,7 +1,5 @@
-use colored::Colorize;
-
 use super::FixedPoint;
-use crate::{mask, to_float, UInt};
+use crate::{fixed_point::debug_print, mask, to_float, UInt};
 
 #[derive(PartialEq, Eq, Clone, Copy)]
 pub struct Q {
@@ -124,20 +122,7 @@ impl std::ops::Mul for Q {
 
 impl std::fmt::Debug for Q {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        // const ANSI_RESET_COLOR: &str = "\x1b[0m";
-        // const ANSI_BLACK: &str = "\x1b[37;40m"; // bold, black background, white foreground
-        // const ANSI_MAGENTA: &str = "\x1b[45m"; // non bold, magenta background, black foreground
-
-        let bits = format!("{:0width$b}", self.val, width = (self.m + self.n) as usize);
-
-        let dots = if self.is_exact { "" } else { "..." };
-
-        let ans = format!(
-            "{int}{frac}{dots}",
-            int = &bits[..self.m as usize].on_magenta().bright_white(),
-            frac = &bits[self.m as usize..].on_black().white(),
-        );
-
+        let ans = debug_print(self.val, self.m, self.m + self.n, self.is_exact);
         write!(f, "{}", ans)
     }
 }

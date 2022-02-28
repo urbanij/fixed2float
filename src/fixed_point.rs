@@ -1,10 +1,31 @@
 mod fp_fx;
 mod fp_q;
+use crate::UInt;
 pub use fp_fx::{to_Fx, Fx};
 pub use fp_q::{to_Q, Q};
 
+use colored::Colorize;
+
 pub trait FixedPoint {
     fn eval(&self) -> f64;
+}
+
+fn debug_print(val: UInt, m: i32, b: i32, is_exact: bool) -> String {
+    // const ANSI_RESET_COLOR: &str = "\x1b[0m";
+    // const ANSI_BLACK: &str = "\x1b[37;40m"; // bold, black background, white foreground
+    // const ANSI_MAGENTA: &str = "\x1b[45m"; // non bold, magenta background, black foreground
+
+    let bits = format!("{:0width$b}", val, width = (b) as usize);
+
+    let dots = if is_exact { "" } else { "..." };
+
+    let ans = format!(
+        "{int}{frac}{dots}",
+        int = &bits[..m as usize].on_magenta().bright_white(),
+        frac = &bits[m as usize..].on_black().white(),
+    );
+
+    ans
 }
 
 #[cfg(test)]
