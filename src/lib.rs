@@ -44,14 +44,13 @@ fn mant(bits: u64) -> u64 {
 /// assert_eq!(to_Q(1.5, 1, 3, true).unwrap().is_exact, true);
 /// ```
 fn to_fixed(x: f64, m: i32, n: i32, round: bool) -> Result<Q, String> {
-    
     if x == 0.0 {
         return Ok(Q {
             val: 0,
             m,
             n,
             is_exact: true,
-        })
+        });
     }
 
     let f64_bits = x.to_bits();
@@ -65,7 +64,9 @@ fn to_fixed(x: f64, m: i32, n: i32, round: bool) -> Result<Q, String> {
                               // now all you have to do is slice out the fractional and non-fractional parts individually.
 
     let fractional_part = bits as u128 & mask((MANT_SIZE as i32 - exp as i32) as u128);
-    let integer_part = bits.checked_shr((MANT_SIZE as i32 - exp as i32) as u32).unwrap_or(0);
+    let integer_part = bits
+        .checked_shr((MANT_SIZE as i32 - exp as i32) as u32)
+        .unwrap_or(0);
 
     // now, depending on `m` and `n` you need to figure out whether rouding occurs.
     // if that's the case, that information is reported back to the user via the `is_exact` flag.
