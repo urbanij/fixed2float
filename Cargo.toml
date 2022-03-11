@@ -14,5 +14,3 @@ exclude = [".github", ".gitignore", "Makefile"]
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-colored = "2.0.0"
-
