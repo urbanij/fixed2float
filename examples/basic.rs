@@ -17,18 +17,18 @@ fn main() {
     let x = 10.25;
     let (m, n) = (21, 3);
 
-    let fp0 = to_Q(x, m, n, true).unwrap();
-    println!("{:?}", fp0);
+    let fx0 = to_Q(x, m, n, true).unwrap();
+    println!("{:?}", fx0);
 
-    let fp1 = Q::new(0b10010011, 6, 2, true); // 36.75
-    let fp2 = Fx::new(0b10010011, 6, 8, true); // 36.75
+    let fx1 = Q::new(0b10010011, 6, 2, true); // 36.75
+    let fx2 = Fx::new(0b10010011, 6, 8, true); // 36.75
 
-    println!("{:?} {} {}", fp1, fp1, fp1.eval());
-    println!("{:?} {} {}", fp2, fp2, fp2.eval());
+    println!("{:?} {} {}", fx1, fx1, fx1.eval());
+    println!("{:?} {} {}", fx2, fx2, fx2.eval());
 
-    // let fp1_sliced = fp1.index(7..0);
-    // println!("{:?}", fp1_sliced);
+    // let fx1_sliced = fx1.index(7..0);
+    // println!("{:?}", fx1_sliced);
 
-    let fp33 = to_Fx(0.000244140625, 0, 12, true);
-    println!("{fp33:?}");
+    let fx33 = to_Fx(0.000244140625, 0, 12, true);
+    println!("{fx33:?}");
 }

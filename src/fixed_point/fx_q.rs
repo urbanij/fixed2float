@@ -82,7 +82,7 @@ impl std::ops::Add for Q {
     type Output = Self;
     fn add(self, rhs: Self) -> Self::Output {
         if self.m != rhs.m || self.n != rhs.n {
-            panic!("`m` and `n` field of each FP obj has to match.")
+            panic!("`m` and `n` field of each Fx obj must match.")
         }
         Self {
             val: self.val + rhs.val,

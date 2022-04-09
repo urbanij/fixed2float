@@ -67,7 +67,7 @@ impl std::ops::Add for Fx {
     type Output = Self;
     fn add(self, rhs: Self) -> Self::Output {
         if self.m != rhs.m || self.b != rhs.b {
-            panic!("`m` and `n` field of each FP obj has to match.")
+            panic!("`m` and `n` field of each fx obj has to match.")
         }
         Self {
             val: self.val + rhs.val,
@@ -122,9 +122,9 @@ impl std::fmt::Display for Fx {
 
 #[allow(non_snake_case)]
 pub fn to_Fx(x: f64, m: i32, b: i32, round: bool) -> Result<Fx, String> {
-    let fp_q = crate::to_fixed(x, m, b - m, round);
-    match fp_q {
-        Ok(fp) => Ok(Fx::new(fp.val, fp.m, fp.m + fp.n, fp.is_exact)),
+    let fx_q = crate::to_fixed(x, m, b - m, round);
+    match fx_q {
+        Ok(fx) => Ok(Fx::new(fx.val, fx.m, fx.m + fx.n, fx.is_exact)),
         Err(e) => Err(e.to_string()),
     }
 }

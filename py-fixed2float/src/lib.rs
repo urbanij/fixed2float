@@ -23,17 +23,17 @@ pub struct Fx {
     pub b: i32,
     #[pyo3(get)]
     pub is_exact: bool,
-    pub fp: f2f::Fx,
+    pub fx: f2f::Fx,
 }
 
 impl From<f2f::Fx> for Fx {
-    fn from(fp: f2f::Fx) -> Self {
+    fn from(fx: f2f::Fx) -> Self {
         Self {
-            val: fp.val,
-            m: fp.m,
-            b: fp.b,
-            is_exact: fp.is_exact,
-            fp,
+            val: fx.val,
+            m: fx.m,
+            b: fx.b,
+            is_exact: fx.is_exact,
+            fx,
         }
     }
 }
@@ -47,48 +47,48 @@ impl Fx {
             m,
             b,
             is_exact: true,
-            fp: f2f::Fx::new(val, m, b, true),
+            fx: f2f::Fx::new(val, m, b, true),
         }
     }
 
     pub fn get_val(&self) -> u128 {
-        self.fp.val
+        self.fx.val
     }
 
     pub fn get_frac_bits(&self) -> i32 {
-        self.fp.b - self.fp.m
+        self.fx.b - self.fx.m
     }
 
     pub fn eval(&self) -> f64 {
-        self.fp.eval()
+        self.fx.eval()
     }
 
     fn __add__(&self, other: Self) -> Self {
-        (self.fp + other.fp).into()
+        (self.fx + other.fx).into()
     }
 
     fn __sub__(&self, other: Self) -> Self {
-        (self.fp - other.fp).into()
+        (self.fx - other.fx).into()
     }
 
     fn __mul__(&self, other: Self) -> Self {
-        (self.fp * other.fp).into()
+        (self.fx * other.fx).into()
     }
 
     fn __lshift__(&self, other: i32) -> Self {
-        (self.fp << other as u32).into()
+        (self.fx << other as u32).into()
     }
 
     fn __rshift__(&self, other: i32) -> Self {
-        (self.fp >> other as u32).into()
+        (self.fx >> other as u32).into()
     }
 
     fn __repr__(&self) -> String {
-        format!("{:?}", self.fp)
+        format!("{:?}", self.fx)
     }
 
     pub fn as_str(&self) -> String {
-        format!("{}", self.fp)
+        format!("{}", self.fx)
     }
 }
 
@@ -97,7 +97,7 @@ impl Fx {
 fn to_Fx(x: f64, m: i32, b: i32, round: bool) -> PyResult<Option<Fx>> {
     let ans = f2f::to_Fx(x, m, b, round);
     match ans {
-        Ok(fp) => Ok(Some(Fx::from(fp))),
+        Ok(fx) => Ok(Some(Fx::from(fx))),
         Err(e) => {
             println!("{}", e);
             Ok(None)
