@@ -1,7 +1,7 @@
+# fixed2float
 [![Crates.io](https://img.shields.io/crates/v/fixed2float)](https://crates.io/crates/fixed2float)
 [![PyPI](https://img.shields.io/pypi/v/fixed2float)](https://pypi.org/project/fixed2float/)
 
-# fixed2float
 
 Simple utility for fixed point to real number conversions, using the VisSim (Fx*m.b*) and Q (Q*m.n*) [notations](https://en.wikipedia.org/wiki/Fixed-point_arithmetic#Notations).
 
@@ -23,10 +23,10 @@ pip install fixed2float
 
 
 ### Examples
+- Interactive notebook [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/urbanij/fixed2float/HEAD?labpath=py-fixed2float%2Fexamples%2Fnotebook.ipynb)
+- [example.py](https://github.com/urbanij/fixed2float/blob/master/py-fixed2float/examples/example.py) (Python) or the 
+- [examples folder](https://github.com/urbanij/fixed2float/tree/master/examples) (Rust) or this online notebook:
 
-See [example.py](https://github.com/urbanij/fixed2float/blob/master/py-fixed2float/examples/example.py) (Python) or the [examples folder](https://github.com/urbanij/fixed2float/tree/master/examples) (Rust) or this online notebook:
-
-[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/urbanij/fixed2float/HEAD?labpath=py-fixed2float%2Fexamples%2Fnotebook.ipynb)
 
 <!-- ### Screencast -->
 
