@@ -1,0 +1,63 @@
+# name: Rust
+# on:
+#   push:
+#     branches: [ master ]
+#   pull_request:
+#     branches: [ master ]
+
+# jobs:
+#   build:
+#     runs-on: ubuntu-latest
+
+#     steps:
+#     - uses: actions/checkout@v2
+#       with:
+#         fetch-depth: 0
+#     - name: Build
+#       run: cargo build --release
+#     - name: Run tests
+#       run: RUST_BACKTRACE=1 cargo test --release
+#     - name: Push to coveralls.io
+#       env:
+#         CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+#       run: |
+#         cargo install cargo-tarpaulin
+#         # cargo tarpaulin --ciserver github-ci --coveralls $CODECOV_TOKEN
+#         cargo tarpaulin --out Xml 
+#         bash <(curl -s https://codecov.io/bash) -t $CODECOV_TOKEN # uuid-repo-token
+        
+name: Test & Coverage
+on: 
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+jobs:
+  test_and_coverage:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install Libraries
+        run: |
+          # sudo apt-get update -y && sudo apt-get install -y liblapacke-dev libopenblas-dev python3-matplotlib
+      - name: Install Rust
+        run: |
+          rustup toolchain install nightly --component llvm-tools-preview
+          rustup default nightly # needed by cargo-llvm-cov on linux? on mac stable works fine (jan 14, 2022)
+      - name: Run tests
+        run: |
+          cargo test --release
+      - name: Install cargo-llvm-cov
+        run: |
+          # curl -LsSf https://github.com/taiki-e/cargo-llvm-cov/releases/latest/download/cargo-llvm-cov-x86_64-unknown-linux-gnu.tar.gz | tar xzf - -C ~/.cargo/bin
+          cargo install cargo-llvm-cov
+      - name: Generate code coverage
+        run: |
+          # cargo llvm-cov --all-features --workspace --ignore-filename-regex build.rs --lcov --output-path lcov.info
+          cargo llvm-cov --all-features --workspace --lcov --output-path lcov.info
+      - name: Upload to codecov.io
+        uses: codecov/codecov-action@v1
+        with:
+          token: ${{secrets.CODECOV_TOKEN}}
+          files: lcov.info
+          fail_ci_if_error: true
