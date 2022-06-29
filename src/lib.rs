@@ -127,9 +127,10 @@ fn to_fixed(x: f64, m: i32, n: i32, round: bool) -> Result<Q, String> {
 /// Compute the real value represented by `bits` (str).
 /// ```rust
 /// use fixed2float::to_float_str;
-/// assert_eq!(to_float_str("00010011000000100001", 12, 8), Ok(304.12890625));
+/// assert_eq!(to_float_str("00010011000000100001", 12, 20), Ok(304.12890625));
 /// ```
-pub fn to_float_str(bits: &str, m: i32, n: i32) -> Result<f64, String> {
+pub fn to_float_str(bits: &str, m: i32, b: i32) -> Result<f64, String> {
+    let n = b - m;
     let bits_size = bits.len() as i32;
     if bits_size != m + n {
         return Err(format!(
@@ -207,10 +208,10 @@ mod tests {
         assert_eq!(to_float(0b1010000010110000, 16, 1, 14).is_err(), true);
         assert_eq!(to_float(0b1010000010110000, 16, 1, 15).is_err(), false);
         assert_eq!(to_float(0b1010000010110000, 16, 1, 16).is_err(), true);
-        assert_eq!(to_float_str("1010000010110000", 1, 15), Ok(1.25537109375));
-        assert_eq!(to_float_str("1010000010110000", 1, 14).is_err(), true);
-        assert_eq!(to_float_str("1010000010110000", 1, 15).is_err(), false);
-        assert_eq!(to_float_str("1010000010110000", 1, 16).is_err(), true);
+        assert_eq!(to_float_str("1010000010110000", 1, 16), Ok(1.25537109375));
+        assert_eq!(to_float_str("1010000010110000", 1, 15).is_err(), true);
+        assert_eq!(to_float_str("1010000010110000", 1, 16).is_err(), false);
+        assert_eq!(to_float_str("1010000010110000", 1, 17).is_err(), true);
     }
 
     #[test]
