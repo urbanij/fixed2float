@@ -1,6 +1,7 @@
 use super::FixedPoint;
 use crate::{fixed_point::debug_print, mask, to_float, UInt};
 
+//#[deprecated(since="4.0.0", note="Use `Fx` instead")]
 #[derive(PartialEq, Eq, Clone, Copy)]
 pub struct Q {
   pub val: UInt,

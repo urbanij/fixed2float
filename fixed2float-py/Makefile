@@ -14,7 +14,7 @@ build: pre-commit
 	maturin build
 	
 install:
-	pip install --force-reinstall $(CARGO_TARGET_DIR)/wheels/fixed2float-*cp310-*.whl
+	pip install --force-reinstall $(CARGO_TARGET_DIR)/wheels/fixed2float-*.whl
 	
 
 pre-commit:

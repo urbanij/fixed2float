@@ -29,7 +29,7 @@ impl Fx {
 
 impl FixedPoint for Fx {
   fn eval(&self) -> f64 {
-    to_float(self.val, self.b, self.m, self.b - self.m).unwrap()
+    to_float(self.val, self.b, self.m, self.b - self.m - 1).unwrap()
   }
 }
 
@@ -72,9 +72,9 @@ impl std::ops::Add for Fx {
     }
     Self {
       val: self.val + rhs.val,
-      m: self.m + 1,
-      b: self.b + 1,
-      is_exact: true,
+      m: self.m,
+      b: self.b,
+      is_exact: self.is_exact && rhs.is_exact,
     }
   }
 }
@@ -123,9 +123,9 @@ impl std::fmt::Display for Fx {
 
 #[allow(non_snake_case)]
 pub fn to_Fx(x: f64, m: i32, b: i32, round: bool) -> Result<Fx, String> {
-  let fx_q = crate::to_fixed(x, m, b - m, round);
+  let fx_q = crate::to_fixed(x, m, b - m - 1, round);
   match fx_q {
-    Ok(fx) => Ok(Fx::new(fx.val, fx.m, fx.m + fx.n, fx.is_exact)),
+    Ok(fx) => Ok(Fx::new(fx.val, fx.m, fx.m + fx.n + 1, fx.is_exact)),
     Err(e) => Err(e.to_string()),
   }
 }

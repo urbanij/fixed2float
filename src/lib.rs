@@ -22,6 +22,10 @@ fn mask(size: u32) -> u128 {
   }
 }
 
+fn sign(bits: u64) -> u64 {
+  bits >> (SIZE - 1)
+}
+
 fn exp(bits: u64) -> u64 {
   ((bits & ((1 << (SIZE - 1)) - 1)) >> MANT_SIZE) & ((1 << MANT_SIZE) - 1)
 }
@@ -33,6 +37,7 @@ fn mant(bits: u64) -> u64 {
 /// Convert `x` (f64) into fixed point format (Qm.n), if possible.
 /// ```rust
 /// use fixed2float::{to_Q, Q};
+/// use fixed2float::to_fixed;
 /// assert_eq!(
 ///     to_Q(1.5, 1, 3, true),
 ///     Ok(
@@ -44,11 +49,24 @@ fn mant(bits: u64) -> u64 {
 ///         }
 ///     )
 /// );
+/// assert_eq!(
+///     to_Q(-2.5, 3, 3, true),
+///     Ok(
+///         Q {
+///             val: 0b1101100,
+///             m: 3,
+///             n: 3,
+///             is_exact: true,
+///         }
+///     )
+/// );
 /// assert_eq!(to_Q(1.5, 1, 3, true).unwrap().val, 0b1100);
 /// assert_eq!(to_Q(0.0, 1, 5, true).unwrap().val, 0);
 /// assert_eq!(to_Q(1.5, 1, 3, true).unwrap().is_exact, true);
+///
+/// assert_eq!(to_fixed(-2.5, 3, 3, false).unwrap().val, 108);
 /// ```
-fn to_fixed(x: f64, m: i32, n: i32, round: bool) -> Result<Q, String> {
+pub fn to_fixed(x: f64, m: i32, n: i32, round: bool) -> Result<Q, String> {
   if x == 0.0 {
     return Ok(Q {
       val: 0,
@@ -59,6 +77,8 @@ fn to_fixed(x: f64, m: i32, n: i32, round: bool) -> Result<Q, String> {
   }
 
   let f64_bits = x.to_bits();
+
+  let sign = sign(f64_bits);
 
   let exp = exp(f64_bits) as i32 - EXP_BIAS as i32;
 
@@ -112,7 +132,13 @@ fn to_fixed(x: f64, m: i32, n: i32, round: bool) -> Result<Q, String> {
   };
 
   let is_exact = !sticky_bit && !round_bit;
-  let ans = ((integer_part_on_m_bits) << n) + fractional_part_on_n_bits;
+  let ans_signless = ((integer_part_on_m_bits) << n) + fractional_part_on_n_bits;
+
+  let ans = match sign == 0 {
+    true => ans_signless,
+    false => (!ans_signless + 1 as UInt) & mask((m + n + 1) as u32),
+  };
+
   Ok(Q {
     val: ans,
     m,
@@ -168,11 +194,11 @@ pub fn to_float_str(bits: &str, m: i32, b: i32) -> Result<f64, String> {
 /// assert_eq!(to_float(0x13021, 20, 12, 8), Ok(304.12890625));
 /// ```
 pub fn to_float(mut bits: UInt, size: i32, m: i32, n: i32) -> Result<f64, String> {
-  if size != m + n {
+  if size != m + n + 1 {
     return Err(format!(
-      "`bits` size  does not match the `m` + `n` size you specified. {} != {}",
+      "`bits` size  does not match the (`m` + `n` + 1) size you specified. {} != {}",
       size,
-      m + n
+      m + n + 1
     ));
   }
 

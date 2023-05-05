@@ -10,6 +10,7 @@ pub trait FixedPoint {
 
 fn debug_print(val: UInt, m: i32, b: i32, is_exact: bool) -> String {
   const ANSI_RESET_COLOR: &str = "\x1b[0m";
+  const ANSI_RED: &str = "\x1b[37;41m";
   const ANSI_BLACK: &str = "\x1b[37;40m"; // bold, black background, white foreground
   const ANSI_MAGENTA: &str = "\x1b[45m"; // non bold, magenta background, black foreground
 
@@ -18,9 +19,10 @@ fn debug_print(val: UInt, m: i32, b: i32, is_exact: bool) -> String {
   let dots = if is_exact { "" } else { "..." };
 
   let ans = format!(
-    "{ANSI_MAGENTA}{int}{ANSI_BLACK}{frac}{dots}{ANSI_RESET_COLOR}",
-    int = &bits[..m as usize],
-    frac = &bits[m as usize..],
+    "{ANSI_RED}{sign}{ANSI_MAGENTA}{int}{ANSI_BLACK}{frac}{dots}{ANSI_RESET_COLOR}",
+    sign = &bits[..1],
+    int = &bits[1..(m + 1) as usize],
+    frac = &bits[(m + 1) as usize..],
   );
 
   ans
