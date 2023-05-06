@@ -1,7 +1,7 @@
 mod fx_fx;
 mod fx_q;
 use crate::UInt;
-pub use fx_fx::{add_incoherent, to_Fx, Fx};
+pub use fx_fx::{to_Fx, Fx};
 pub use fx_q::{to_Q, Q};
 
 pub trait FixedPoint {
@@ -31,7 +31,7 @@ fn debug_print(val: UInt, m: i32, b: i32, is_exact: bool) -> String {
 #[cfg(test)]
 mod test {
 
-  use crate::fixed_point::Q;
+  use crate::fixed_point::{Fx, Q};
 
   #[test]
   fn test_add() {
@@ -43,9 +43,9 @@ mod test {
 
   #[test]
   fn test_sub() {
-    let fx1 = Q::new(0b1111, 3, 1, true);
-    let fx2 = Q::new(0b1110, 3, 1, true);
-    let fx3 = Q::new(0b0001, 3, 1, true);
+    let fx1 = Fx::new(0b0_111_1, 3, 5, true); // 7.5
+    let fx2 = Fx::new(0b0_111_0, 3, 5, true); // 7.0
+    let fx3 = Fx::new(0b0_000_1, 3, 5, true); // 0.5
     assert_eq!(fx1 - fx2, fx3);
   }
 

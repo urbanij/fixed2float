@@ -130,11 +130,8 @@ impl std::fmt::Debug for Q {
 
 impl std::fmt::Display for Q {
   fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-    let ans;
-
-    ans = format!("Q<{},{}>({})", self.m, self.n, self.val);
+    let ans = format!("Q<{},{}>({})", self.m, self.n, self.val);
     // ans = self.q_fmt();
-
     write!(f, "{}", ans)
   }
 }

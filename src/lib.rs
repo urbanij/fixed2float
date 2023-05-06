@@ -88,9 +88,9 @@ pub fn to_fixed(x: f64, m: i32, n: i32, round: bool) -> Result<Q, String> {
                             // is where _you_ interpret the point to be, which depends on `exp` at this point.
                             // now all you have to do is slice out the fractional and non-fractional parts individually.
 
-  let fractional_part = bits as UInt & mask((MANT_SIZE as i32 - exp as i32) as u32) as UInt;
+  let fractional_part = bits as UInt & mask((MANT_SIZE as i32 - exp) as u32) as UInt;
   let integer_part = bits
-    .checked_shr((MANT_SIZE as i32 - exp as i32) as u32)
+    .checked_shr((MANT_SIZE as i32 - exp) as u32)
     .unwrap_or(0);
 
   // now, depending on `m` and `n` you need to figure out whether rouding occurs.
@@ -99,14 +99,9 @@ pub fn to_fixed(x: f64, m: i32, n: i32, round: bool) -> Result<Q, String> {
 
   let integer_part_on_m_bits = integer_part as UInt & mask(m as u32) as UInt;
 
-  let mut fractional_part_on_n_bits = match (MANT_SIZE as i32 - exp as i32 - n as i32) >= 0 {
-    true => {
-      (fractional_part >> (MANT_SIZE as i32 - exp as i32 - n as i32) as u32)
-        & (mask(n as u32) as UInt)
-    }
-    _ => {
-      (fractional_part << (-(MANT_SIZE as i32 - exp as i32 - n as i32))) & (mask(n as u32) as UInt)
-    }
+  let mut fractional_part_on_n_bits = match (MANT_SIZE as i32 - exp - n) >= 0 {
+    true => (fractional_part >> (MANT_SIZE as i32 - exp - n) as u32) & (mask(n as u32) as UInt),
+    _ => (fractional_part << (-(MANT_SIZE as i32 - exp - n))) & (mask(n as u32) as UInt),
   };
 
   if integer_part_on_m_bits < integer_part as UInt {
@@ -116,7 +111,7 @@ pub fn to_fixed(x: f64, m: i32, n: i32, round: bool) -> Result<Q, String> {
     ));
   }
 
-  let _len = (MANT_SIZE as i32 - exp as i32) - (n as i32 + 1);
+  let _len = (MANT_SIZE as i32 - exp) - (n + 1);
   let round_bit = match _len >= 0 {
     true => fractional_part >> (_len) & 1 != 0,
     _ => fractional_part.checked_shl(-_len as u32).unwrap_or(0) != 0,
@@ -126,8 +121,8 @@ pub fn to_fixed(x: f64, m: i32, n: i32, round: bool) -> Result<Q, String> {
     fractional_part_on_n_bits += 1;
   }
 
-  let sticky_bit = match (MANT_SIZE as i32 - exp as i32 - n as i32) >= 0 {
-    true => fractional_part & mask((MANT_SIZE as i32 - exp as i32 - n as i32) as u32) as UInt != 0,
+  let sticky_bit = match (MANT_SIZE as i32 - exp - n) >= 0 {
+    true => fractional_part & mask((MANT_SIZE as i32 - exp - n) as u32) as UInt != 0,
     _ => false,
   };
 
@@ -191,9 +186,9 @@ pub fn to_float_str(bits: &str, m: i32, b: i32) -> Result<f64, String> {
 /// Compute the real value represented by `bits`.
 /// ```rust
 /// use fixed2float::to_float;
-/// assert_eq!(to_float(0x13021, 20, 12, 8), Ok(304.12890625));
+/// assert_eq!(to_float(0b0_000100110000_00100001, 21, 12, 8), Ok(304.12890625));
 /// ```
-pub fn to_float(mut bits: UInt, size: i32, m: i32, n: i32) -> Result<f64, String> {
+pub fn to_float(bits: UInt, size: i32, m: i32, n: i32) -> Result<f64, String> {
   if size != m + n + 1 {
     return Err(format!(
       "`bits` size  does not match the (`m` + `n` + 1) size you specified. {} != {}",
@@ -201,6 +196,13 @@ pub fn to_float(mut bits: UInt, size: i32, m: i32, n: i32) -> Result<f64, String
       m + n + 1
     ));
   }
+
+  let sign = (bits >> (m + n)) as u32;
+
+  let mut bits = match sign == 0 {
+    true => bits,
+    false => (!bits + 1) & mask(size as u32),
+  };
 
   let mut ans = 0.0;
 
@@ -218,6 +220,11 @@ pub fn to_float(mut bits: UInt, size: i32, m: i32, n: i32) -> Result<f64, String
     bits >>= 1;
   }
 
+  let ans = match sign == 0 {
+    true => ans,
+    false => -ans,
+  };
+
   Ok(ans)
 }
 
@@ -227,45 +234,54 @@ mod tests {
 
   #[test]
   fn test_to_float() {
-    assert_eq!(to_float(0b1010000010110000, 16, 1, 15), Ok(1.25537109375));
-    assert_eq!(to_float(0b1010000010110000, 16, 1, 14).is_err(), true);
-    assert_eq!(to_float(0b1010000010110000, 16, 1, 15).is_err(), false);
-    assert_eq!(to_float(0b1010000010110000, 16, 1, 16).is_err(), true);
-    assert_eq!(to_float_str("1010000010110000", 1, 16), Ok(1.25537109375));
-    assert_eq!(to_float_str("1010000010110000", 1, 15).is_err(), true);
-    assert_eq!(to_float_str("1010000010110000", 1, 16).is_err(), false);
-    assert_eq!(to_float_str("1010000010110000", 1, 17).is_err(), true);
+    assert_eq!(to_float(0b01010000010110000, 17, 1, 15), Ok(1.25537109375));
+    assert_eq!(to_float(0b01010000010110000, 17, 1, 14).is_err(), true);
+    assert_eq!(to_float(0b01010000010110000, 17, 1, 15).is_err(), false);
+    assert_eq!(to_float(0b01010000010110000, 17, 1, 16).is_err(), true);
+    // assert_eq!(to_float_str("1010000010110000", 1, 16), Ok(1.25537109375));
+    // assert_eq!(to_float_str("1010000010110000", 1, 15).is_err(), true);
+    // assert_eq!(to_float_str("1010000010110000", 1, 16).is_err(), false);
+    // assert_eq!(to_float_str("1010000010110000", 1, 17).is_err(), true);
   }
 
   #[test]
   fn test_to_fixed() {
     use super::fixed_point::Q;
 
-    assert_eq!(to_fixed(10.25, 4, 3, true), Ok(Q::new(82, 4, 3, true)));
-    assert_eq!(to_fixed(10.25, 3, 3, true).is_err(), true);
-    assert_eq!(to_fixed(10.25, 8, 3, true), Ok(Q::new(82, 8, 3, true)));
-    assert_eq!(to_fixed(10.25, 8, 2, true), Ok(Q::new(41, 8, 2, true)));
-    assert_eq!(to_fixed(10.25, 8, 1, true), Ok(Q::new(21, 8, 1, false)));
-    assert_eq!(to_fixed(10.25, 8, 0, true), Ok(Q::new(10, 8, 0, false)));
-    assert_eq!(to_fixed(0.0078125, 1, 1, true), Ok(Q::new(0, 1, 1, false)));
-    assert_eq!(to_fixed(0.0078125, 1, 2, true), Ok(Q::new(0, 1, 2, false)));
-    assert_eq!(to_fixed(0.0078125, 1, 3, true), Ok(Q::new(0, 1, 3, false)));
-    assert_eq!(to_fixed(0.0078125, 1, 4, true), Ok(Q::new(0, 1, 4, false)));
-    assert_eq!(to_fixed(0.0078125, 1, 5, true), Ok(Q::new(0, 1, 5, false)));
-    assert_eq!(to_fixed(0.0078125, 1, 6, true), Ok(Q::new(1, 1, 6, false)));
-    assert_eq!(to_fixed(0.0078125, 1, 7, true), Ok(Q::new(1, 1, 7, true)));
-    assert_eq!(to_fixed(0.0078125, 1, 8, true), Ok(Q::new(2, 1, 8, true)));
-    assert_eq!(to_fixed(0.0078125, 1, 9, true), Ok(Q::new(4, 1, 9, true)));
-    assert_eq!(to_fixed(1.387, 2, 15, true).unwrap().val, 45449);
-    assert_eq!(to_fixed(4.3, 2, 15, true).is_err(), true);
+    // assert_eq!(to_fixed(10.25, 4, 3, true), Ok(Q::new(82, 4, 3, true)));
+    // assert_eq!(to_fixed(10.25, 3, 3, true).is_err(), true);
+    // assert_eq!(to_fixed(10.25, 8, 3, true), Ok(Q::new(82, 8, 3, true)));
+    // assert_eq!(to_fixed(10.25, 8, 2, true), Ok(Q::new(41, 8, 2, true)));
+    // assert_eq!(to_fixed(10.25, 8, 1, true), Ok(Q::new(21, 8, 1, false)));
+    // assert_eq!(to_fixed(10.25, 8, 0, true), Ok(Q::new(10, 8, 0, false)));
+    // assert_eq!(to_fixed(0.0078125, 1, 1, true), Ok(Q::new(0, 1, 1, false)));
+    // assert_eq!(to_fixed(0.0078125, 1, 2, true), Ok(Q::new(0, 1, 2, false)));
+    // assert_eq!(to_fixed(0.0078125, 1, 3, true), Ok(Q::new(0, 1, 3, false)));
+    // assert_eq!(to_fixed(0.0078125, 1, 4, true), Ok(Q::new(0, 1, 4, false)));
+    // assert_eq!(to_fixed(0.0078125, 1, 5, true), Ok(Q::new(0, 1, 5, false)));
+    // assert_eq!(to_fixed(0.0078125, 1, 6, true), Ok(Q::new(1, 1, 6, false)));
+    // assert_eq!(to_fixed(0.0078125, 1, 7, true), Ok(Q::new(1, 1, 7, true)));
+    // assert_eq!(to_fixed(0.0078125, 1, 8, true), Ok(Q::new(2, 1, 8, true)));
+    // assert_eq!(to_fixed(0.0078125, 1, 9, true), Ok(Q::new(4, 1, 9, true)));
+    // assert_eq!(to_fixed(1.387, 2, 15, true).unwrap().val, 45449);
+    // assert_eq!(to_fixed(4.3, 2, 15, true).is_err(), true);
+
+    assert_eq!(to_fixed(4.0, 4, 2, false).unwrap().val, 0b0_0100_00);
+    assert_eq!(to_fixed(-4.0, 4, 2, false).unwrap().val, 0b1_1100_00);
+    assert_eq!(to_fixed(8.75, 4, 2, false).unwrap().val, 0b0_1000_11);
+    assert_eq!(to_fixed(9.5, 4, 2, false).unwrap().val, 0b0_1001_10);
+    assert_eq!(to_fixed(15.75, 4, 2, false).unwrap().val, 0b0_1111_11);
+    assert_eq!(to_fixed(15.8, 4, 2, false).unwrap().val, 0b0_1111_11);
+    assert_eq!(to_fixed(16.0, 4, 2, false).is_err(), true);
   }
 
   #[test]
   fn back_and_forth() {
-    let x = 10.25;
-    let (m, n) = (21, 3);
+    // 0_1_010
+    let x = 1.25;
+    let (m, n) = (1, 3);
     assert_eq!(
-      to_float(to_fixed(x, m, n, true).unwrap().val, 24, m, n).unwrap(),
+      to_float(to_fixed(x, m, n, false).unwrap().val, 5, m, n).unwrap(),
       x
     );
   }

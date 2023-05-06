@@ -36,11 +36,11 @@ fn main() {
   let fixed11 = to_fixed(-2.5, 3, 3, false);
   println!("{:?}", fixed11);
 
-  let fixed22 = to_Fx(10.2, 4, 15, false);
+  let fixed22 = to_Fx(10.0, 4, 15, false);
   println!("{:?}", fixed22);
 
-  let fixed23 = to_Fx(-10.2, 5, 15, false);
+  let fixed23 = to_Fx(5.8, 4, 15, false);
   println!("{:?}", fixed23);
 
-  println!("{:?}", fixed22.clone().unwrap() + fixed23.unwrap());
+  println!("{:?}", fixed22.unwrap() + fixed23.unwrap());
 }

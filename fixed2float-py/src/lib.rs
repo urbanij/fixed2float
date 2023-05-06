@@ -51,16 +51,29 @@ impl PyFx {
     }
   }
 
-  // fn __sub__(&self, other: Self) -> Self {
-  //   (self.fx - other.fx).into()
-  // }
+  fn __neg__(&self) -> Self {
+    Self { inner: -self.inner }
+  }
+
+  fn __sub__(&self, other: Self) -> Self {
+    Self {
+      inner: self.inner + (-other.inner),
+    }
+  }
 
   // fn __mul__(&self, other: Self) -> Self {
-  //   (self.fx * other.fx).into()
+  //   Self {
+  //     inner: self.inner * other.inner,
+  //   }
   // }
 
   fn __repr__(&self) -> PyResult<String> {
-    let ans = format!("{}, {:?}", self.inner.to_string(), self.inner);
+    let ans = format!(
+      "{:?} {} {}",
+      self.inner,
+      self.inner,
+      self.eval()
+    );
     Ok(ans)
   }
 }
