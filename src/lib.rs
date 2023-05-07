@@ -67,18 +67,18 @@ fn mant(bits: u64) -> u64 {
 /// assert_eq!(to_fixed(-2.5, 3, 3, false).unwrap().val, 108);
 /// ```
 pub fn to_fixed(x: f64, m: i32, n: i32, round: bool) -> Result<Q, String> {
-  if x == 0.0 {
+  let f64_bits = x.to_bits();
+
+  let sign = sign(f64_bits);
+
+  if x.abs() == 0.0 {
     return Ok(Q {
-      val: 0,
+      val: (sign << (m + n)) as UInt,
       m,
       n,
       is_exact: true,
     });
   }
-
-  let f64_bits = x.to_bits();
-
-  let sign = sign(f64_bits);
 
   let exp = exp(f64_bits) as i32 - EXP_BIAS as i32;
 
@@ -142,6 +142,7 @@ pub fn to_fixed(x: f64, m: i32, n: i32, round: bool) -> Result<Q, String> {
   })
 }
 
+#[deprecated(since="0.4.0")]
 /// Compute the real value represented by `bits` (str).
 /// ```rust
 /// use fixed2float::to_float_str;
@@ -273,6 +274,8 @@ mod tests {
     assert_eq!(to_fixed(15.75, 4, 2, false).unwrap().val, 0b0_1111_11);
     assert_eq!(to_fixed(15.8, 4, 2, false).unwrap().val, 0b0_1111_11);
     assert_eq!(to_fixed(16.0, 4, 2, false).is_err(), true);
+    assert_eq!(to_fixed(0.0, 2, 1, false).unwrap().val, 0b0_00_0);
+    assert_eq!(to_fixed(-0.0, 2, 1, false).unwrap().val, 0b1_00_0);
   }
 
   #[test]

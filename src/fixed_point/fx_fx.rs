@@ -33,35 +33,6 @@ impl FixedPoint for Fx {
   }
 }
 
-impl std::ops::Shl<u32> for Fx {
-  type Output = Self;
-  fn shl(self, rhs: u32) -> Self::Output {
-    Self {
-      val: (self.val << rhs) & mask((self.b) as u32) as UInt,
-      m: self.m,
-      b: self.b,
-      is_exact: self.is_exact,
-    }
-  }
-}
-
-impl std::ops::Shr<u32> for Fx {
-  type Output = Self;
-  fn shr(self, rhs: u32) -> Self::Output {
-    // let val = (self.val >> rhs) & mask((self.b) as u32) as u64;
-    let val = match self.val.checked_shr(rhs) {
-      Some(v) => v & mask(self.b as u32) as UInt,
-      None => 0,
-    };
-
-    Self {
-      val,
-      m: self.m,
-      b: self.b,
-      is_exact: self.is_exact,
-    }
-  }
-}
 
 impl std::ops::Add for Fx {
   type Output = Self;
@@ -74,7 +45,7 @@ impl std::ops::Add for Fx {
     let (m, b) = (self.m, self.b);
 
     let sum_eval = self.eval() + rhs.eval();
-    if sum_eval.log2() >= m as f64 {
+    if sum_eval.abs().log2() >= m as f64 {
       panic!("{} can't fit into {} integer bits", sum_eval, m);
     }
 
@@ -171,49 +142,24 @@ pub fn to_Fx(x: f64, m: i32, b: i32, round: bool) -> Result<Fx, String> {
   }
 }
 
-/// Addition of Fx types belonging to different families
-/// e.g. Fx<5, 10> + Fx<2, 40> => Fx<5, 40> + Fx<5, 40> => Fx<6, 41>
-#[deprecated(since = "4.0.0")]
-#[allow(dead_code)]
-pub fn add_incoherent(fx1: Fx, fx2: Fx) -> Fx {
-  // println!("{:?}", fx1);
-  // println!("{:?}", fx2);
+// /// Addition of Fx types belonging to different families
+// /// e.g. Fx<5, 10> + Fx<2, 40> => Fx<5, 40> + Fx<5, 40> => Fx<6, 41>
+// #[deprecated(since = "4.0.0")]
+// pub fn add_incoherent(fx1: Fx, fx2: Fx) -> Fx {
+//   // println!("{:?}", fx1);
+//   // println!("{:?}", fx2);
 
-  let (m_new, b_new) = (std::cmp::max(fx1.m, fx2.m), std::cmp::max(fx1.b, fx2.b));
-  /*
-  let fx1_new = Fx::new(fx1.val << (b_new - fx1.b), m_new, b_new, false);
-  let fx2_new = Fx::new(fx2.val >> (m_new - fx2.m), m_new, b_new, false);
-  */
-  let fx1_new = to_Fx(fx1.eval(), m_new, b_new, true).unwrap();
-  let fx2_new = to_Fx(fx2.eval(), m_new, b_new, true).unwrap();
+//   let (m_new, b_new) = (std::cmp::max(fx1.m, fx2.m), std::cmp::max(fx1.b, fx2.b));
+//   /*
+//   let fx1_new = Fx::new(fx1.val << (b_new - fx1.b), m_new, b_new, false);
+//   let fx2_new = Fx::new(fx2.val >> (m_new - fx2.m), m_new, b_new, false);
+//   */
+//   let fx1_new = to_Fx(fx1.eval(), m_new, b_new, true).unwrap();
+//   let fx2_new = to_Fx(fx2.eval(), m_new, b_new, true).unwrap();
 
-  // println!("{:?}", fx1_new);
-  // println!("{:?}", fx2_new);
+//   // println!("{:?}", fx1_new);
+//   // println!("{:?}", fx2_new);
 
-  fx1_new + fx2_new
-}
+//   fx1_new + fx2_new
+// }
 
-#[cfg(test)]
-mod test {
-
-  use crate::fixed_point::{to_Fx, Fx};
-
-  /*
-  #[test]
-  fn test_add_incoherent_1() {
-    let fx1 = to_Fx(10.2, 5, 10, true).unwrap();
-    let fx2 = to_Fx(2.2, 2, 40, true).unwrap();
-    assert_eq!(
-      fx1 + fx2,
-      Fx::new(0b00110001100011001100110011001100110011010, 6, 41, true)
-    );
-  }
-
-  #[test]
-  fn test_add_incoherent_2() {
-    let fx1 = to_Fx(1.1, 6, 10, true).unwrap();
-    let fx2 = to_Fx(2.2, 4, 20, true).unwrap();
-    assert_eq!(fx1 + fx2, Fx::new(0b000001101010011001101, 7, 21, true));
-  }
-  */
-}

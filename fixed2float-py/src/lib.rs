@@ -21,6 +21,7 @@ struct PyFx {
 #[pymethods]
 impl PyFx {
   #[new]
+  #[deprecated(since = "0.4.0")]
   fn new(val: u128, m: i32, b: i32) -> Self {
     Self {
       inner: Fx {
@@ -68,12 +69,7 @@ impl PyFx {
   // }
 
   fn __repr__(&self) -> PyResult<String> {
-    let ans = format!(
-      "{:?} {} {}",
-      self.inner,
-      self.inner,
-      self.eval()
-    );
+    let ans = format!("{:?} {} {}", self.inner, self.inner, self.eval());
     Ok(ans)
   }
 }
@@ -160,8 +156,15 @@ impl PyFx {
 // }
 
 #[pyfunction]
+#[deprecated(since = "0.4.0")]
 #[pyo3(signature = (x, m, b, round=false))]
 fn py_to_Fx(x: f64, m: i32, b: i32, round: bool) -> PyResult<Option<PyFx>> {
+  py_from_double(x, m, b, round)
+}
+
+#[pyfunction]
+#[pyo3(signature = (x, m, b, round=false))]
+fn py_from_double(x: f64, m: i32, b: i32, round: bool) -> PyResult<Option<PyFx>> {
   let ans = to_Fx(x, m, b, round);
   match ans {
     Ok(fx) => Ok(Some(PyFx { inner: fx })),
@@ -170,6 +173,12 @@ fn py_to_Fx(x: f64, m: i32, b: i32, round: bool) -> PyResult<Option<PyFx>> {
       Ok(None)
     }
   }
+}
+
+#[pyfunction]
+fn py_from_bits(val: u128, m: i32, b: i32) -> PyResult<Option<PyFx>> {
+  let fx = Fx::new(val, m, b, true);
+  Ok(Some(PyFx { inner: fx }))
 }
 
 // #[pyfunction]
@@ -200,6 +209,8 @@ fn py_to_Fx(x: f64, m: i32, b: i32, round: bool) -> PyResult<Option<PyFx>> {
 #[pymodule]
 fn fixed2float(_py: Python, m: &PyModule) -> PyResult<()> {
   m.add_class::<PyFx>()?;
+  m.add_function(wrap_pyfunction!(py_from_double, m)?)?;
+  m.add_function(wrap_pyfunction!(py_from_bits, m)?)?;
   m.add_function(wrap_pyfunction!(py_to_Fx, m)?)?;
   // m.add_function(wrap_pyfunction!(to_float, m)?)?;
   // m.add_function(wrap_pyfunction!(to_float_str, m)?)?;
