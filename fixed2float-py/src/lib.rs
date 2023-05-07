@@ -74,87 +74,6 @@ impl PyFx {
   }
 }
 
-// #[pyclass(name = "Fx")]
-// // #[repr(transparent)]
-// #[derive(Clone)]
-// pub struct Fx {
-//   #[pyo3(get)]
-//   pub val: u128,
-//   #[pyo3(get)]
-//   pub m: i32,
-//   #[pyo3(get)]
-//   pub b: i32,
-//   #[pyo3(get)]
-//   pub is_exact: bool,
-//   pub fx: f2f::Fx,
-// }
-
-// impl From<f2f::Fx> for Fx {
-//   fn from(fx: f2f::Fx) -> Self {
-//     Self {
-//       val: fx.val,
-//       m: fx.m,
-//       b: fx.b,
-//       is_exact: fx.is_exact,
-//       fx,
-//     }
-//   }
-// }
-
-// #[pymethods]
-// impl Fx {
-//   #[new]
-//   fn new(val: u128, m: i32, b: i32) -> Self {
-//     Self {
-//       val,
-//       m,
-//       b,
-//       is_exact: true,
-//       fx: f2f::Fx::new(val, m, b, true),
-//     }
-//   }
-
-//   pub fn get_val(&self) -> u128 {
-//     self.fx.val
-//   }
-
-//   pub fn get_frac_bits(&self) -> i32 {
-//     self.fx.b - self.fx.m
-//   }
-
-//   pub fn eval(&self) -> f64 {
-//     self.fx.eval()
-//   }
-
-//   fn __add__(&self, other: Self) -> Self {
-//     (self.fx + other.fx).into()
-//   }
-
-//   fn __sub__(&self, other: Self) -> Self {
-//     (self.fx - other.fx).into()
-//   }
-
-//   fn __mul__(&self, other: Self) -> Self {
-//     (self.fx * other.fx).into()
-//   }
-
-//   fn __lshift__(&self, other: i32) -> Self {
-//     (self.fx << other as u32).into()
-//   }
-
-//   fn __rshift__(&self, other: i32) -> Self {
-//     (self.fx >> other as u32).into()
-//   }
-
-//   fn __repr__(&self) -> String {
-//     format!("{:?}", self.fx)
-//   }
-
-//   pub fn as_str(&self) -> String {
-//     format!("{}", self.fx)
-//   }
-// }
-
 #[pyfunction]
 #[deprecated(since = "0.4.0")]
 #[pyo3(signature = (x, m, b, round=false))]
@@ -212,8 +131,6 @@ fn fixed2float(_py: Python, m: &PyModule) -> PyResult<()> {
   m.add_function(wrap_pyfunction!(py_from_double, m)?)?;
   m.add_function(wrap_pyfunction!(py_from_bits, m)?)?;
   m.add_function(wrap_pyfunction!(py_to_Fx, m)?)?;
-  // m.add_function(wrap_pyfunction!(to_float, m)?)?;
-  // m.add_function(wrap_pyfunction!(to_float_str, m)?)?;
   m.add_function(wrap_pyfunction!(version, m)?)?;
   Ok(())
 }
