@@ -21,7 +21,6 @@ struct PyFx {
 #[pymethods]
 impl PyFx {
   #[new]
-  #[deprecated(since = "0.4.0")]
   fn new(val: u128, m: i32, b: i32) -> Self {
     Self {
       inner: Fx {
@@ -34,8 +33,17 @@ impl PyFx {
   }
 
   #[getter]
-  fn get_val(&self) -> i32 {
-    self.inner.val.try_into().unwrap()
+  fn get_val(&self) -> u128 {
+    // i can access the val attribute just with `obj.val`
+    self.inner.val
+  }
+
+  pub fn get_sign(&self) -> i32 {
+    (self.inner.val >> (self.inner.b)).try_into().unwrap()
+  }
+
+  pub fn get_int_bits(&self) -> i32 {
+    self.inner.m
   }
 
   pub fn get_frac_bits(&self) -> i32 {

@@ -4,7 +4,7 @@
 [![codecov](https://codecov.io/gh/urbanij/fixed2float/branch/master/graph/badge.svg?token=9JEMJTB2IT)](https://codecov.io/gh/urbanij/fixed2float)
 
 
-Simple utility for fixed point to real number conversions, using the VisSim (Fx*m.b*) and Q (Q*m.n*) [notations](https://en.wikipedia.org/wiki/Fixed-point_arithmetic#Notations).
+Simple utility for fixed point to real number conversions, using the VisSim (Fx*m.b*) ~~and Q (Q*m.n*)~~ [notation](https://en.wikipedia.org/wiki/Fixed-point_arithmetic#Notations).
 
 ### Usage
 
@@ -14,8 +14,6 @@ Simple utility for fixed point to real number conversions, using the VisSim (Fx*
 cargo add fixed2float
 ```
 
-which will automatically fetch the most recent version from the registry and update one line on Cargo.toml.
-
 - as a dependency of your Python library
 
 ```sh
@@ -24,8 +22,8 @@ pip install fixed2float
 
 
 ### Examples
-- Interactive notebook [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/urbanij/fixed2float/HEAD?labpath=py-fixed2float%2Fexamples%2Fnotebook.ipynb)
-- [example.py](https://github.com/urbanij/fixed2float/blob/master/py-fixed2float/examples/example.py) (Python)
+- Interactive notebook [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/urbanij/fixed2float/HEAD?labpath=fixed2float-py%2Fexamples%2Fnotebook.ipynb)
+- [example.py](https://github.com/urbanij/fixed2float/blob/master/fixed2float-py/examples/example.py) (Python)
 - [examples folder](https://github.com/urbanij/fixed2float/tree/master/examples) (Rust) 
 
 
@@ -33,7 +31,3 @@ pip install fixed2float
 
 <!-- [![asciicast](https://asciinema.org/a/463661.svg)](https://asciinema.org/a/463661) -->
 
-
-### Similar projects
-
-- [javascript's fixed2float](https://www.npmjs.com/package/fixed2float)
