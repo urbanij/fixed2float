@@ -22,8 +22,8 @@ pip install fixed2float
 
 
 ### Examples
-- Interactive notebook [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/urbanij/fixed2float/HEAD?labpath=fixed2float-py%2Fexamples%2Fnotebook.ipynb)
-- [example.py](https://github.com/urbanij/fixed2float/blob/master/fixed2float-py/examples/example.py) (Python)
+- Interactive notebook [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/urbanij/fixed2float/HEAD?labpath=py-fixed2float%2Fexamples%2Fnotebook.ipynb)
+- [example.py](https://github.com/urbanij/fixed2float/blob/master/py-fixed2float/examples/example.py) (Python)
 - [examples folder](https://github.com/urbanij/fixed2float/tree/master/examples) (Rust) 
 
 

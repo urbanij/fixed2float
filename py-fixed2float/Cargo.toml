@@ -1,5 +1,5 @@
 [package]
-name = "fixed2float-py"
+name = "py-fixed2float"
 version = "4.0.0-rc1"
 authors = ["Francesco Urbani <francescourbanidue@gmail.com>"]
 edition = "2021"
