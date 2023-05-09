@@ -1,6 +1,7 @@
 use super::FixedPoint;
 use crate::{fixed_point::debug_print, mask, to_float, UInt};
 
+//#[deprecated(since="4.0.0", note="Use `Fx` instead")]
 #[derive(PartialEq, Eq, Clone, Copy)]
 pub struct Q {
   pub val: UInt,
@@ -129,11 +130,8 @@ impl std::fmt::Debug for Q {
 
 impl std::fmt::Display for Q {
   fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-    let ans;
-
-    ans = format!("Q<{},{}>({})", self.m, self.n, self.val);
+    let ans = format!("Q<{},{}>({})", self.m, self.n, self.val);
     // ans = self.q_fmt();
-
     write!(f, "{}", ans)
   }
 }

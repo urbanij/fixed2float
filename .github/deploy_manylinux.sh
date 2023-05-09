@@ -10,4 +10,4 @@ cd py-fixed2float
 rustup override set nightly-2022-01-01
 maturin publish \
   --skip-existing \
-  --username fran
+  --username __token__

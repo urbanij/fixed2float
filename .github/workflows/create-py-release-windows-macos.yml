@@ -33,7 +33,7 @@ jobs:
         - name: Publish wheel
           shell: bash
           env:
-            MATURIN_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
+            MATURIN_PASSWORD: ${{ secrets.PYPI_FIXED2FLOAT_TOKEN }}
           run: |
             rustup override set nightly-2022-01-01
             # export RUSTFLAGS='-C target-feature=+fxsr,+sse,+sse2,+sse3'
@@ -45,7 +45,7 @@ jobs:
             --skip-existing \
             -o wheels \
             -i python \
-            --username fran \
+            --username __token__ \
             
   build_manylinux:
     name: Create Release manylinux
@@ -55,7 +55,7 @@ jobs:
       - name: Publish wheel
         uses: docker://konstin2/maturin:latest
         env:
-          MATURIN_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
+          MATURIN_PASSWORD: ${{ secrets.PYPI_FIXED2FLOAT_TOKEN }}
         with:
           entrypoint: /bin/bash
           args: .github/deploy_manylinux.sh

@@ -4,7 +4,7 @@
 [![codecov](https://codecov.io/gh/urbanij/fixed2float/branch/master/graph/badge.svg?token=9JEMJTB2IT)](https://codecov.io/gh/urbanij/fixed2float)
 
 
-Simple utility for fixed point to real number conversions, using the VisSim (Fx*m.b*) and Q (Q*m.n*) [notations](https://en.wikipedia.org/wiki/Fixed-point_arithmetic#Notations).
+Simple utility for fixed point to real number conversions, using the VisSim (Fx*m.b*) ~~and Q (Q*m.n*)~~ [notation](https://en.wikipedia.org/wiki/Fixed-point_arithmetic#Notations).
 
 ### Usage
 
@@ -13,8 +13,6 @@ Simple utility for fixed point to real number conversions, using the VisSim (Fx*
 ```sh
 cargo add fixed2float
 ```
-
-which will automatically fetch the most recent version from the registry and update one line on Cargo.toml.
 
 - as a dependency of your Python library
 
@@ -33,7 +31,3 @@ pip install fixed2float
 
 <!-- [![asciicast](https://asciinema.org/a/463661.svg)](https://asciinema.org/a/463661) -->
 
-
-### Similar projects
-
-- [javascript's fixed2float](https://www.npmjs.com/package/fixed2float)

@@ -1,6 +1,6 @@
 [package]
-name = "fixed2float-py"
-version = "3.0.1"
+name = "py-fixed2float"
+version = "4.0.0-rc2"
 authors = ["Francesco Urbani <francescourbanidue@gmail.com>"]
 edition = "2021"
 keywords = ["fixed", "float", "q-format"]
@@ -27,4 +27,4 @@ name = "fixed2float"
 
 [dependencies]
 fixed2float = { path = "../" }
-pyo3 = { version = "0.15.1", features = ["extension-module"], optional = false }
+pyo3 = { version = "0.18.2", features = ["extension-module"], optional = false }

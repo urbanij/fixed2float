@@ -1,7 +1,7 @@
 mod fx_fx;
 mod fx_q;
 use crate::UInt;
-pub use fx_fx::{add_incoherent, to_Fx, Fx};
+pub use fx_fx::{to_Fx, Fx};
 pub use fx_q::{to_Q, Q};
 
 pub trait FixedPoint {
@@ -10,6 +10,7 @@ pub trait FixedPoint {
 
 fn debug_print(val: UInt, m: i32, b: i32, is_exact: bool) -> String {
   const ANSI_RESET_COLOR: &str = "\x1b[0m";
+  const ANSI_RED: &str = "\x1b[37;41m";
   const ANSI_BLACK: &str = "\x1b[37;40m"; // bold, black background, white foreground
   const ANSI_MAGENTA: &str = "\x1b[45m"; // non bold, magenta background, black foreground
 
@@ -18,9 +19,10 @@ fn debug_print(val: UInt, m: i32, b: i32, is_exact: bool) -> String {
   let dots = if is_exact { "" } else { "..." };
 
   let ans = format!(
-    "{ANSI_MAGENTA}{int}{ANSI_BLACK}{frac}{dots}{ANSI_RESET_COLOR}",
-    int = &bits[..m as usize],
-    frac = &bits[m as usize..],
+    "{ANSI_RED}{sign}{ANSI_MAGENTA}{int}{ANSI_BLACK}{frac}{dots}{ANSI_RESET_COLOR}",
+    sign = &bits[..1],
+    int = &bits[1..(m + 1) as usize],
+    frac = &bits[(m + 1) as usize..],
   );
 
   ans
@@ -29,21 +31,27 @@ fn debug_print(val: UInt, m: i32, b: i32, is_exact: bool) -> String {
 #[cfg(test)]
 mod test {
 
-  use crate::fixed_point::Q;
+  use crate::fixed_point::{Fx, Q};
 
   #[test]
-  fn test_add() {
-    let fx1 = Q::new(0b1111, 3, 1, true);
-    let fx2 = Q::new(0b1110, 3, 1, true);
-    let fx3 = Q::new(0b11101, 4, 1, true);
-    assert_eq!(fx1 + fx2, fx3);
+  fn test_neg() {
+    let fx1 = Fx::new(0b0_000_0, 3, 5, true); // 0
+    let fx1_neg = Fx::new(0b0_000_0, 3, 5, true); // 0
+    assert_eq!(-fx1, fx1_neg);
+  }
+
+  #[test]
+  fn test_neg_zero() {
+    let fx1 = Fx::new(0b0_001_000110110011101111100011101110111111010001000110100, 3, 55, true); // 1.106382592570549
+    let fx1_neg = Fx::new(0b1_110_111001001100010000011100010001000000101110111001100, 3, 55, true); // -1.106382592570549
+    assert_eq!(-fx1, fx1_neg);
   }
 
   #[test]
   fn test_sub() {
-    let fx1 = Q::new(0b1111, 3, 1, true);
-    let fx2 = Q::new(0b1110, 3, 1, true);
-    let fx3 = Q::new(0b0001, 3, 1, true);
+    let fx1 = Fx::new(0b0_111_1, 3, 5, true); // 7.5
+    let fx2 = Fx::new(0b0_111_0, 3, 5, true); // 7.0
+    let fx3 = Fx::new(0b0_000_1, 3, 5, true); // 0.5
     assert_eq!(fx1 - fx2, fx3);
   }
 
