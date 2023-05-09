@@ -38,6 +38,11 @@ impl PyFx {
     self.inner.val
   }
 
+  #[getter]
+  fn get_is_exact(&self) -> bool {
+    self.inner.is_exact
+  }
+
   pub fn get_sign(&self) -> i32 {
     (self.inner.val >> (self.inner.b)).try_into().unwrap()
   }
@@ -75,6 +80,11 @@ impl PyFx {
   //     inner: self.inner * other.inner,
   //   }
   // }
+
+  pub fn as_str(&self) -> String {
+    // Fx<1,14>(12496)
+    format!("{}", self.inner)
+  }
 
   fn __repr__(&self) -> PyResult<String> {
     let ans = format!("{:?} {} {}", self.inner, self.inner, self.eval());

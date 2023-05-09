@@ -34,11 +34,17 @@ mod test {
   use crate::fixed_point::{Fx, Q};
 
   #[test]
-  fn test_add() {
-    let fx1 = Q::new(0b1111, 3, 1, true);
-    let fx2 = Q::new(0b1110, 3, 1, true);
-    let fx3 = Q::new(0b11101, 4, 1, true);
-    assert_eq!(fx1 + fx2, fx3);
+  fn test_neg() {
+    let fx1 = Fx::new(0b0_000_0, 3, 5, true); // 0
+    let fx1_neg = Fx::new(0b0_000_0, 3, 5, true); // 0
+    assert_eq!(-fx1, fx1_neg);
+  }
+
+  #[test]
+  fn test_neg_zero() {
+    let fx1 = Fx::new(0b0_001_000110110011101111100011101110111111010001000110100, 3, 55, true); // 1.106382592570549
+    let fx1_neg = Fx::new(0b1_110_111001001100010000011100010001000000101110111001100, 3, 55, true); // -1.106382592570549
+    assert_eq!(-fx1, fx1_neg);
   }
 
   #[test]

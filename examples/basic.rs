@@ -33,14 +33,23 @@ fn main() {
   // let fx33 = to_Fx(-2.44140625, 4, 12, true);
   // println!("{fx33:?}");
 
-  let fixed11 = to_fixed(-2.5, 3, 3, false);
-  println!("{:?}", fixed11);
 
-  let fixed22 = to_Fx(10.0, 4, 15, false);
-  println!("{:?}", fixed22);
+  // let fixed11 = to_fixed(-2.5, 3, 3, false);
+  // println!("{:?}", fixed11);
 
-  let fixed23 = to_Fx(5.8, 4, 15, false);
-  println!("{:?}", fixed23);
+  // let fixed22 = to_Fx(10.0, 4, 15, false);
+  // println!("{:?}", fixed22);
 
-  println!("{:?}", fixed22.unwrap() + fixed23.unwrap());
+  // let fixed23 = to_Fx(5.8, 4, 15, false);
+  // println!("{:?}", fixed23);
+
+  // println!("{:?}", fixed22.unwrap() + fixed23.unwrap());
+
+
+  // println!("{:?}", to_float(0b1_000, 4, 3, 0));
+
+
+  let a = Fx::new(0b11111111111111111111110010100000010001001011000100100110000000000000000000000000000000000000000000000000000000000000000000000000, 31, 128, true);
+  println!("{:?}", a.eval());
+
 }

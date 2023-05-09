@@ -1,6 +1,6 @@
 [package]
 name = "fixed2float"
-version = "4.0.0-rc1"
+version = "4.0.0-rc2"
 authors = ["Francesco Urbani <francescourbanidue@gmail.com>"]
 edition = "2021"
 keywords = ["fixed", "float", "q-format"]

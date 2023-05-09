@@ -98,6 +98,9 @@ impl std::ops::Sub for Fx {
 impl std::ops::Neg for Fx {
   type Output = Self;
   fn neg(self) -> Self::Output {
+    if self.val == 0 {
+      return self;
+    }
     Self {
       val: (!self.val + 1) & mask(self.b as u32),
       m: self.m,

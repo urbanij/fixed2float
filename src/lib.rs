@@ -15,11 +15,25 @@ const MANT_SIZE: u64 = 52;
 const ES: u64 = 11;
 const EXP_BIAS: u64 = (1 << (ES - 1)) - 1;
 
+
+/// Create bit mask
+/// ```rust
+/// use crate::fixed2float::{Fx, FixedPoint};
+/// assert_eq!(Fx::new(0b11111111111111111111110010100000010001001011000100100110000000000000000000000000000000000000000000000000000000000000000000000000, 31, 128, true).eval(), -863.7316719293594);
+/// ```
 fn mask(size: u32) -> u128 {
-  match 1_u128.checked_shl(size) {
-    Some(v) => v - 1,
-    None => 0,
-  }
+  // https://users.rust-lang.org/t/how-to-make-an-integer-with-n-bits-set-without-overflow/63078/3
+  u128::MAX >> (128 - size)
+  
+  // This will not work for e.g.:
+  // ```rust
+  // let a = Fx::new(0b11111111111111111111110010100000010001001011000100100110000000000000000000000000000000000000000000000000000000000000000000000000, 31, 128, true);
+  // println!("{:?}", a.eval());
+  // ```
+  // match 1_u128.wrapping_shl(size) {
+  //   Some(v) => v - 1,
+  //   None => 0,
+  // }
 }
 
 fn sign(bits: u64) -> u64 {
@@ -200,6 +214,10 @@ pub fn to_float(bits: UInt, size: i32, m: i32, n: i32) -> Result<f64, String> {
 
   let sign = (bits >> (m + n)) as u32;
 
+  if sign == 1 && (bits & mask(size as u32 - 1) == 0) {
+    return Ok(-((1 << m) as f64));
+  }
+
   let mut bits = match sign == 0 {
     true => bits,
     false => (!bits + 1) & mask(size as u32),
@@ -243,6 +261,25 @@ mod tests {
     // assert_eq!(to_float_str("1010000010110000", 1, 15).is_err(), true);
     // assert_eq!(to_float_str("1010000010110000", 1, 16).is_err(), false);
     // assert_eq!(to_float_str("1010000010110000", 1, 17).is_err(), true);
+
+    // Fx<3,4>
+    assert_eq!(to_float(0b0_000, 4, 3, 0), Ok(0.0));
+    assert_eq!(to_float(0b0_001, 4, 3, 0), Ok(1.0));
+    assert_eq!(to_float(0b0_010, 4, 3, 0), Ok(2.0));
+    assert_eq!(to_float(0b0_011, 4, 3, 0), Ok(3.0));
+    assert_eq!(to_float(0b0_100, 4, 3, 0), Ok(4.0));
+    assert_eq!(to_float(0b0_101, 4, 3, 0), Ok(5.0));
+    assert_eq!(to_float(0b0_110, 4, 3, 0), Ok(6.0));
+    assert_eq!(to_float(0b0_111, 4, 3, 0), Ok(7.0));
+    assert_eq!(to_float(0b1_000, 4, 3, 0), Ok(-8.0));
+    assert_eq!(to_float(0b1_001, 4, 3, 0), Ok(-7.0));
+    assert_eq!(to_float(0b1_010, 4, 3, 0), Ok(-6.0));
+
+    // Fx<3,8>
+    assert_eq!(to_float(0b0_1111_111, 8, 4, 3), Ok(15.875));
+    assert_eq!(to_float(0b1_0000_000, 8, 4, 3), Ok(-16.0));
+    assert_eq!(to_float(0b1_0000_001, 8, 4, 3), Ok(-15.875));
+    
   }
 
   #[test]
