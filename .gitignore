@@ -9,6 +9,6 @@ Cargo.lock
 *.dylib
 
 __pycache__
-notebook-checkpoint.ipynb
+*-checkpoint.ipynb
 
 py-*/dist

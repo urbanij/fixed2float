@@ -75,11 +75,11 @@ impl PyFx {
     }
   }
 
-  // fn __mul__(&self, other: Self) -> Self {
-  //   Self {
-  //     inner: self.inner * other.inner,
-  //   }
-  // }
+  fn __mul__(&self, other: Self) -> Self {
+    Self {
+      inner: self.inner * other.inner,
+    }
+  }
 
   pub fn as_str(&self) -> String {
     // Fx<1,14>(12496)

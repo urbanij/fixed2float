@@ -1,5 +1,5 @@
 use super::FixedPoint;
-use crate::{fixed_point::debug_print, mask, to_float, UInt};
+use crate::{fixed_point::debug_print, mask, to_fixed, to_float, UInt};
 
 #[derive(PartialEq, Eq, Clone, Copy)]
 pub struct Fx {
@@ -32,7 +32,6 @@ impl FixedPoint for Fx {
     to_float(self.val, self.b, self.m, self.b - self.m - 1).unwrap()
   }
 }
-
 
 impl std::ops::Add for Fx {
   type Output = Self;
@@ -112,12 +111,58 @@ impl std::ops::Neg for Fx {
 
 impl std::ops::Mul for Fx {
   type Output = Self;
+  ///
+  /// ```rust
+  /// use fixed2float::Fx;
+  /// let m = Fx::new(0b0_0001_100, 4, 8, true) * Fx::new(0b1_1101_010, 4, 8, true); // 1.5 * -2.75 == -4.125
+  /// let mul = Fx::new(0b1_1011_111, 4, 8, true);
+  /// assert_eq!(m, mul);
+  /// ```
   fn mul(self, rhs: Self) -> Self::Output {
+    if self.m != rhs.m || self.b != rhs.b {
+      panic!("`m` and `n` field of each fx obj has to match.")
+      // return add_incoherent(self, rhs);
+    }
+
+    let (m, b) = (self.m, self.b);
+    let n = b - m - 1;
+
+    let mul_eval = self.eval() * rhs.eval();
+
+    if mul_eval.abs().log2() >= m as f64 {
+      panic!("{} can't fit into {} integer bits", mul_eval, m);
+    }
+
+    let sign_val1 = self.val >> (b - 1);
+    let sign_val2 = rhs.val >> (b - 1);
+
+    let abs_val1 = match sign_val1 == 0 {
+      true => self.val,
+      false => (!self.val + 1) & mask(b as u32),
+    };
+
+    let abs_val2 = match sign_val2 == 0 {
+      true => rhs.val,
+      false => (!rhs.val + 1) & mask(b as u32),
+    };
+
+    let abs_val_mul = abs_val1 * abs_val2;
+    let fixed_mul_sign = sign_val1 ^ sign_val2;
+
+    let is_exact = (self.is_exact && rhs.is_exact) && (abs_val_mul & mask(n as u32) == 0);
+
+    let abs_val_mul_adjusted = abs_val_mul >> n;
+
+    let val_mul_adjusted = match fixed_mul_sign == 0 {
+      true => abs_val_mul_adjusted,
+      false => (!abs_val_mul_adjusted + 1) & mask(b as u32),
+    };
+
     Self {
-      val: self.val * rhs.val,
-      m: self.m + rhs.m,
-      b: self.b + rhs.b,
-      is_exact: true,
+      val: val_mul_adjusted,
+      m: self.m,
+      b: self.b,
+      is_exact,
     }
   }
 }
@@ -165,4 +210,3 @@ pub fn to_Fx(x: f64, m: i32, b: i32, round: bool) -> Result<Fx, String> {
 
 //   fx1_new + fx2_new
 // }
-

@@ -15,7 +15,6 @@ const MANT_SIZE: u64 = 52;
 const ES: u64 = 11;
 const EXP_BIAS: u64 = (1 << (ES - 1)) - 1;
 
-
 /// Create bit mask
 /// ```rust
 /// use crate::fixed2float::{Fx, FixedPoint};
@@ -24,7 +23,7 @@ const EXP_BIAS: u64 = (1 << (ES - 1)) - 1;
 fn mask(size: u32) -> u128 {
   // https://users.rust-lang.org/t/how-to-make-an-integer-with-n-bits-set-without-overflow/63078/3
   u128::MAX >> (128 - size)
-  
+
   // This will not work for e.g.:
   // ```rust
   // let a = Fx::new(0b11111111111111111111110010100000010001001011000100100110000000000000000000000000000000000000000000000000000000000000000000000000, 31, 128, true);
@@ -156,7 +155,7 @@ pub fn to_fixed(x: f64, m: i32, n: i32, round: bool) -> Result<Q, String> {
   })
 }
 
-#[deprecated(since="0.4.0")]
+#[deprecated(since = "0.4.0")]
 /// Compute the real value represented by `bits` (str).
 /// ```rust
 /// use fixed2float::to_float_str;
@@ -279,7 +278,6 @@ mod tests {
     assert_eq!(to_float(0b0_1111_111, 8, 4, 3), Ok(15.875));
     assert_eq!(to_float(0b1_0000_000, 8, 4, 3), Ok(-16.0));
     assert_eq!(to_float(0b1_0000_001, 8, 4, 3), Ok(-15.875));
-    
   }
 
   #[test]
